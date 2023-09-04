@@ -69,6 +69,7 @@ export default function CreateQuiz() {
 
 	return (
 		<Dialog>
+			{' '}
 			<DialogTrigger className='bg-blue-500 text-primary-foreground px-4 py-2 rounded-md'>
 				Create Quiz
 			</DialogTrigger>
@@ -76,6 +77,7 @@ export default function CreateQuiz() {
 				<form
 					onSubmit={handleSubmit(onSubmit)}
 					className='flex flex-col gap-5'>
+					<h1 className='text-2xl font-semibold col-span-6'>Create Quiz</h1>
 					<div className='flex flex-col'>
 						<label
 							htmlFor='question'

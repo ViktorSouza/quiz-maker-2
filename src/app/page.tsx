@@ -21,6 +21,7 @@ export default async function Home({
 		orderBy: { createdAt: 'desc' },
 		include: { Quiz: true },
 	})
+	console.log(activities)
 	const quizzes = await prisma.quiz.findMany({
 		where: {
 			userId: user?.id ?? '',
@@ -28,6 +29,7 @@ export default async function Home({
 		skip: page * 10,
 		take: 10,
 	})
+
 	const collections = await prisma.quizCollection.findMany({
 		where: {
 			userId: user?.id,
@@ -38,7 +40,7 @@ export default async function Home({
 	})
 
 	return (
-		<main className='max-w-7xl mx-auto grid grid-cols-8 gap-3'>
+		<div className='grid grid-cols-8 gap-3'>
 			<h1 className='text-2xl font-semibold col-span-6'>Collections</h1>
 			<div className='flex items-stretch gap-3 col-span-2'>
 				<CreateQuiz />
@@ -48,39 +50,6 @@ export default async function Home({
 					My attempts
 				</Link>
 			</div>
-			{/* <section className='col-span-2'>
-					<h1 className='text-2xl font-semibold'>Your activities</h1>
-					<div className='space-y-5 overflow-y-scroll h-96'>
-						{activities.map((activity) => (
-							<div
-								key={activity.id}
-								className='bg-slate-100 rounded-md px-4 py-2'>
-								<h1 className='text-xl'>{activity.Quiz?.question}</h1>
-								You selected:{' '}
-								<span
-									className={`${
-										activity.selectedOption === activity.correctOption
-											? 'text-green-500'
-											: 'text-red-500'
-									}`}>
-									{activity.selectedOption}
-								</span>
-								<br />
-								Correct answer: {activity.correctOption}
-							</div>
-						))}
-					</div>
-				</section> */}
-
-			{/* <section className='col-span-4'>
-				<div className='grid gap-2 grid-cols-4'>
-					{quizzes.map((quiz) => (
-						<QuizCard
-							key={quiz.id}
-							quiz={quiz}></QuizCard>
-					))}
-				</div>
-			</section> */}
 
 			<section className='col-span-6 my-5 grid grid-cols-6 gap-5'>
 				<span className='text-sm font-light col-span-3'>Collection</span>
@@ -91,7 +60,9 @@ export default async function Home({
 					<div
 						key={collection.id}
 						className='bg-slate-100 px-4  py-1 rounded-md grid gap-5 col-span-6 grid-cols-6 items-center'>
-						<div className='col-span-2'>
+						<Link
+							href={`/collections/${collection.id}`}
+							className='col-span-2'>
 							<h1>{collection.name}</h1>
 							<p className='text-xs'>
 								Created:{' '}
@@ -101,7 +72,7 @@ export default async function Home({
 									year: 'numeric',
 								})}
 							</p>
-						</div>
+						</Link>
 						<button className='bg-slate-300 p-2 px-4 rounded-md w-min'>
 							Edit
 						</button>
@@ -114,7 +85,7 @@ export default async function Home({
 							})}
 						</span>
 						<Link
-							href={'/play/quiz'}
+							href={`/play/quiz/${collection.id}`}
 							className='bg-blue-500 px-4 py-2 rounded-md text-primary-foreground text-center'>
 							Play
 						</Link>
@@ -132,6 +103,6 @@ export default async function Home({
 				<h1 className='text-2xl font-semibold'>Your activities</h1>
 				<ActivityChart activities={activities} />
 			</section>
-		</main>
+		</div>
 	)
 }

@@ -59,7 +59,8 @@ export default function ActivityChart({
 			undefined,
 			dateFormat,
 		)
-		//TODO fix when the activity's date is older than a week
+		if (!days.find((value) => value[0] == day)) return prev
+
 		return { ...prev, [day]: (prev[day] || 0) + 1 }
 	}, daysObject as Record<string, number>)
 

@@ -1,5 +1,5 @@
 import { NextApiRequest } from 'next'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '../../../../lib/db'
 import { z } from 'zod'
 import { getCurrentUser } from '../../../../lib/utils'
@@ -40,4 +40,22 @@ export async function POST(
 	} else {
 		return NextResponse.json({ message: 'incorrect' })
 	}
+}
+
+export async function GET(
+	req: NextRequest,
+	{ params }: { params: { id: string } },
+) {
+	const page = Number(req.nextUrl.searchParams.get('page')) || 0
+	const user = await getCurrentUser()
+
+	const quizzes = await prisma.quiz.findMany({
+		where: {
+			userId: user?.id,
+			quizCollectionId: params.id,
+		},
+		skip: page * 10,
+		take: 10,
+	})
+	return NextResponse.json({ quizzes })
 }

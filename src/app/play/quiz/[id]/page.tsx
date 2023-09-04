@@ -1,14 +1,16 @@
 'use client'
 import { Quiz } from '@prisma/client'
-import { api, shuffle } from '../../../lib/utils'
+import { api, shuffle } from '../../../../lib/utils'
 // import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useMemo, useEffect, useState } from 'react'
 import { ArrowLeft, StepBack, StepBackIcon } from 'lucide-react'
 import useSWR from 'swr'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
-export default function Play() {
+export default function Play({}) {
+	const pathName = usePathname()
 	const [selectedOption, setSelectedOption] = useState<string | null>(null)
 	const [page, setPage] = useState(0)
 
@@ -16,7 +18,7 @@ export default function Play() {
 		data: quizzes,
 		isLoading,
 		error,
-	} = useSWR<Quiz[]>(`/quizzes?page=${page}`, (url) => {
+	} = useSWR<Quiz[]>(`/play-quiz/${pathName.slice(11)}?page=${page}`, (url) => {
 		return api.get(url).then((res) => {
 			return res.data.quizzes
 		})

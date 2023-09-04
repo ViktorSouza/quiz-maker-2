@@ -5,7 +5,7 @@ export default function MainHeader() {
 	const session = useSession()
 	console.log(session)
 	return (
-		<header className='w-screen border-b border-slate-300 p-5 mb-5'>
+		<header className='w-screen border-b  p-5 mb-5'>
 			<div className='flex justify-between w-full max-w-7xl mx-auto'>
 				<Link href={'/'}>
 					<h1 className='font-semibold text-blue-500 text-lg'>
