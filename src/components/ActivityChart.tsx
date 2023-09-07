@@ -42,10 +42,11 @@ export default function ActivityChart({
 	const oneDay = 1000 * 60 * 60 * 24
 
 	const days: [key: string, value: number][] = []
+	const amountOfDays = 30
 
-	for (let day = 0; day <= 7; day++) {
+	for (let day = 0; day <= amountOfDays; day++) {
 		days.push([
-			new Date(Date.now() - oneDay * (7 - day)).toLocaleDateString(
+			new Date(Date.now() - oneDay * (amountOfDays - day)).toLocaleDateString(
 				undefined,
 				dateFormat,
 			),
@@ -70,8 +71,14 @@ export default function ActivityChart({
 
 		responsive: true,
 		scales: {
-			x: { grid: { display: false }, ticks: { color: colors.slate[500] } },
-			y: { grid: { display: false }, ticks: { color: colors.slate[500] } },
+			x: {
+				grid: { display: false },
+				ticks: { maxTicksLimit: 5, color: colors.slate[500] },
+			},
+			y: {
+				grid: { display: false },
+				ticks: { maxTicksLimit: 3, color: colors.slate[500] },
+			},
 		},
 	}
 
@@ -87,7 +94,6 @@ export default function ActivityChart({
 			},
 		],
 	}
-	console.log(uga)
 	return (
 		<div>
 			<Bar

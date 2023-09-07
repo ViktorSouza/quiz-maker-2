@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '../../../lib/db'
 import { getCurrentUser } from '../../../lib/utils'
+import { z } from 'zod'
 
 export async function GET() {
 	const user = await getCurrentUser()
@@ -19,9 +20,12 @@ export async function GET() {
 export async function POST(req: Request) {
 	const user = await getCurrentUser()
 	const body = await req.json()
-	const { name } = body
+	//TODO add a schema
+	const { name, description, tags } = body
 	const collection = await prisma.quizCollection.create({
 		data: {
+			description,
+			tags,
 			name,
 			userId: user?.id ?? '',
 		},

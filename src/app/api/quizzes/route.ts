@@ -7,7 +7,6 @@ import { getCurrentUser } from '../../../lib/utils'
 export async function GET(req: NextRequest) {
 	const page = Number(req.nextUrl.searchParams.get('page')) || 0
 	const user = await getCurrentUser()
-	console.log('ugauga', user)
 
 	const quizzes = await prisma.quiz.findMany({
 		where: {

@@ -23,7 +23,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from '@/components/ui/popover'
-import { QuizCollection } from '@prisma/client'
+import { Quiz, QuizCollection } from '@prisma/client'
 import CreateCollection from './CreateCollection'
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
 type Inputs = {
@@ -31,8 +31,15 @@ type Inputs = {
 	correctOption: string
 	question: string
 	quizCollectionId: string
+	tags: string[]
 }
-export default function CreateQuiz() {
+export default function CreateQuiz({
+	isEditing = false,
+	quiz,
+}: {
+	isEditing?: boolean
+	quiz: Quiz
+}) {
 	const {
 		register,
 		handleSubmit,
@@ -41,8 +48,13 @@ export default function CreateQuiz() {
 		watch,
 		formState: { errors },
 	} = useForm<Inputs>({
-		defaultValues: { options: ['', '', '', ''] },
+		defaultValues: quiz,
 	})
+	const {
+		fields: fieldsTag,
+		append: appendTag,
+		remove: removeTag,
+	} = useFieldArray({ control, name: 'tags' })
 	console.log('watch colletion:', watch('quizCollectionId'))
 	if (errors) {
 		console.log(errors)
@@ -62,21 +74,24 @@ export default function CreateQuiz() {
 	const route = useRouter()
 
 	const onSubmit: SubmitHandler<Inputs> = async (data) => {
-		const res = await api.post('/quizzes', data)
+		if (isEditing) {
+			await api.patch(`/quizzes/${quiz.id}`, data)
+		} else {
+			const res = await api.post('/quizzes', data)
+		}
 		control._reset()
 		route.refresh()
 	}
 
 	return (
 		<Dialog>
-			{' '}
-			<DialogTrigger className='bg-blue-500 text-primary-foreground px-4 py-2 rounded-md'>
-				Create Quiz
+			<DialogTrigger className='bg-blue-500 text-slate-100 px-4 py-2 rounded-md'>
+				{isEditing ? 'Edit Quiz' : 'Create Quiz'}
 			</DialogTrigger>
 			<DialogContent>
 				<form
 					onSubmit={handleSubmit(onSubmit)}
-					className='flex flex-col gap-5'>
+					className='flex flex-col gap-5 max-h-screen overflow-y-scroll'>
 					<h1 className='text-2xl font-semibold col-span-6'>Create Quiz</h1>
 					<div className='flex flex-col'>
 						<label
@@ -182,7 +197,7 @@ export default function CreateQuiz() {
 									<input
 										title='Wrong option'
 										type='text'
-										className='bg-slate-300 rounded-md py-2 px-3 w-full'
+										className='bg-slate-300 dark:bg-slate-700 rounded-md py-2 px-3 w-full'
 										{...register(`options.${index}`, { required: true })}
 									/>
 									<button
@@ -215,12 +230,45 @@ export default function CreateQuiz() {
 							Add Option
 						</button>
 					</div>
+					<div className='space-y-2'>
+						<h1 className='font-medium'>Tags</h1>
+						{fieldsTag.map((option, index) => (
+							<div
+								className='flex flex-col'
+								key={option.id}>
+								<div className='flex justify-stretch w-full gap-2'>
+									<input
+										title='Wrong option'
+										type='text'
+										className='bg-slate-300 dark:bg-slate-700 rounded-md py-2 px-3 w-full'
+										{...register(`tags.${index}`, { required: true })}
+									/>
+									<button
+										className='bg-destructive text-primary-foreground px-3 rounded-md'
+										title='Remove option'
+										type='button'
+										onClick={() => {
+											removeTag(index)
+										}}>
+										<Trash2 size={16} />
+									</button>
+								</div>
+							</div>
+						))}
+					</div>
+					<button
+						className=' w-full font-medium bg-slate-300 rounded-md px-4 py-2 text-primary flex items-center justify-center gap-2 hover:bg-slate-300'
+						type='button'
+						onClick={() => appendTag('')}>
+						<PlusCircle size={16} />
+						Add Option
+					</button>
 					<button className='bg-primary w-full rounded-md px-4 py-2 text-primary-foreground flex justify-center gap-2'>
-						Create Quiz
+						{isEditing ? 'Edit Quiz' : 'Create Quiz'}
 					</button>
 					<button
 						className='bg-destructive text-primary-foreground px-4 py-2 rounded-md'
-						type='button'>
+						onClick={() => control._reset()}>
 						Reset
 					</button>
 				</form>

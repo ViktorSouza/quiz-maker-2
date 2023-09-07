@@ -1,3 +1,4 @@
+import { EditCollection } from '@/components/EditCollection'
 import Image from 'next/image'
 import CreateQuiz from '@/components/CreateQuiz'
 import { Prisma, Quiz, UserPlay } from '@prisma/client'
@@ -43,23 +44,23 @@ export default async function Home({
 		<div className='grid grid-cols-8 gap-3'>
 			<h1 className='text-2xl font-semibold col-span-6'>Collections</h1>
 			<div className='flex items-stretch gap-3 col-span-2'>
-				<CreateQuiz />
+				<CreateQuiz isEditing={false} />
 				<Link
 					href={'attempts'}
-					className='bg-slate-300 text-primary px-4 py-2 rounded-md'>
+					className='bg-slate-300 dark:bg-slate-800 transition hover:bg-slate-200 dark:hover:bg-slate-700 text-primary px-4 py-2 rounded-md'>
 					My attempts
 				</Link>
 			</div>
 
 			<section className='col-span-6 my-5 grid grid-cols-6 gap-5'>
-				<span className='text-sm font-light col-span-3'>Collection</span>
+				<span className='text-sm font-light col-span-3 pl-4'>Collection</span>
 				<span className='text-sm font-light'>Questions</span>
 				<span className='text-sm font-light'>Updated</span>
 
 				{collections.map((collection) => (
 					<div
 						key={collection.id}
-						className='bg-slate-100 px-4  py-1 rounded-md grid gap-5 col-span-6 grid-cols-6 items-center'>
+						className='bg-slate-200 dark:bg-slate-900 px-4  py-1 rounded-md grid gap-5 col-span-6 grid-cols-6 items-center'>
 						<Link
 							href={`/collections/${collection.id}`}
 							className='col-span-2'>
@@ -73,9 +74,7 @@ export default async function Home({
 								})}
 							</p>
 						</Link>
-						<button className='bg-slate-300 p-2 px-4 rounded-md w-min'>
-							Edit
-						</button>
+						<EditCollection collection={collection} />
 						<span>{collection._count.quizzes}</span>
 						<span>
 							{collection.updatedAt.toLocaleDateString(undefined, {
@@ -86,16 +85,9 @@ export default async function Home({
 						</span>
 						<Link
 							href={`/play/quiz/${collection.id}`}
-							className='bg-blue-500 px-4 py-2 rounded-md text-primary-foreground text-center'>
+							className='bg-blue-500 transition  hover:bg-blue-400 px-4 py-2 rounded-md text-slate-100 text-center'>
 							Play
 						</Link>
-						{/* <ul className=' flex gap-3'>
-							{collection.tags.map((tag) => (
-								<li key={tag}>
-									<span className='bg-slate-300 px-1 rounded-md'>{tag}</span>
-								</li>
-							))}
-						</ul> */}
 					</div>
 				))}
 			</section>

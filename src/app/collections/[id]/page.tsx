@@ -1,3 +1,4 @@
+import { BreadCrumbs } from '@/components/Breadcrumbs'
 import GoBack from '@/components/GoBack'
 import { notFound } from 'next/navigation'
 import { QuizCard } from '../../../components/QuizCard'
@@ -32,10 +33,21 @@ export default async function Collection({
 	})
 
 	if (!collection) return notFound()
+	const breadCrumbs = [
+		{ name: 'Collections', url: '/collections' },
+		{
+			name: collection.name,
+			url: `/collections/${collection.id}`,
+		},
+	]
 	return (
 		<section className='col-span-4 w-full'>
-			<GoBack />
-			<h1 className='text-2xl font-semibold col-span-6'>{collection.name}</h1>
+			<div className='flex justify-between mb-5'>
+				<BreadCrumbs breadCrumbs={breadCrumbs} />
+				<GoBack />
+			</div>
+
+			<h1 className='text-2xl font-semibold col-span-6'>Quizzes</h1>
 			<div className='grid gap-2 grid-cols-4'>
 				{collection.quizzes.map((quiz) => (
 					<QuizCard

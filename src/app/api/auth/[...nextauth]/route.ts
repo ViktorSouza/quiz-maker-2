@@ -11,7 +11,7 @@ export const authOptions: AuthOptions = {
 		}),
 	],
 	callbacks: {
-		async signIn({ user, account, profile }) {
+		async signIn({ user }) {
 			// Handle successful authentication
 			// Save user data using Prisma
 			if (!user?.email || !user?.name) return false
@@ -27,10 +27,11 @@ export const authOptions: AuthOptions = {
 			return true
 		},
 		jwt({ token, user, account, profile }) {
-			return { ...token, bah: user }
+			return { ...token }
 		},
 		async session({ session, token }) {
 			// Populate session with user data from the database
+
 			const userData = await prisma.user.findUnique({
 				where: { email: token?.email ?? '' },
 			})
