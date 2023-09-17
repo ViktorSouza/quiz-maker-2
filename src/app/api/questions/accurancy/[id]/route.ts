@@ -11,16 +11,15 @@ export async function GET(
 	const correctQuizzes = await prisma.userPlay.count({
 		where: {
 			userId: user?.id,
-			quizId: id,
+			questionId: id,
 			correctOption: { equals: prisma.userPlay.fields.selectedOption },
 		},
 	})
 	const allQuizzes = await prisma.userPlay.count({
 		where: {
 			userId: user?.id,
-			quizId: id,
+			questionId: id,
 		},
 	})
-	console.log('accurancyyyyyyyyyyyy', correctQuizzes, allQuizzes, id)
 	return NextResponse.json({ accurancy: correctQuizzes / allQuizzes })
 }

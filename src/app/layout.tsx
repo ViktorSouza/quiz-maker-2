@@ -22,10 +22,10 @@ export default function RootLayout({
 			lang='en'
 			className={`${cookies().get('theme')?.value == 'dark' && 'dark'}`}>
 			<body
-				className={`${inter.className} text-primary bg-slate-100 dark:bg-slate-950 `}>
+				className={`${inter.className} text-primary bg-slate-50 dark:bg-slate-950 `}>
 				<Providers>
 					<MainHeader />
-					<main className='max-w-7xl mx-auto p-5'>{children}</main>
+					<main className='p-5 mx-auto max-w-7xl'>{children}</main>
 				</Providers>
 			</body>
 		</html>

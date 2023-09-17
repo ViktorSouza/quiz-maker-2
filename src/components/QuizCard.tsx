@@ -1,111 +1,68 @@
-'use client'
-import { MoreVertical } from 'lucide-react'
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from '@/components/ui/popover'
 import { Quiz } from '@prisma/client'
-import useSWR from 'swr'
-import { api } from '../lib/utils'
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import {
-	Accordion,
-	AccordionContent,
-	AccordionItem,
-	AccordionTrigger,
-} from '@/components/ui/accordion'
-import CreateQuiz from './CreateQuiz'
+import Link from 'next/link'
+import QuizEditorComponent from './QuizEditorComponent'
+import { Bookmark, Lock } from 'lucide-react'
 
-export function QuizCard({ quiz }: { quiz: Quiz }) {
-	const { data: quizAccurancy } = useSWR(
-		`quizzes/accurancy/${quiz.id}`,
-		(url: string) => api.get(url).then((res) => res.data.accurancy),
-		{ fallbackData: 0 },
-	)
+export default function QuizCard({
+	quiz,
+	isFavorited,
+}: {
+	isFavorited: boolean
+	quiz: Quiz & {
+		_count: {
+			User: number
+			questions: number
+		}
+	}
+}) {
 	return (
-		<div className='bg-slate-200 p-5 rounded-md gap-2 flex flex-col  relative'>
-			<div className='right-3 absolute'></div>
-			<h1 className='text-2xl'>{quiz.question}</h1>
-			<p>
-				Answer: <span className='font-medium'>{quiz.correctOption}</span>
-			</p>
-			<div>
-				<span>Accurancy</span>
-
-				<div className='w-full h-3 bg-slate-300 rounded-full'>
-					<div
-						className='bg-blue-500 rounded-full h-full'
-						style={{
-							width: `${quizAccurancy * 100}%`,
-						}}></div>
+		<div
+			key={quiz.id}
+			className='bg-slate-100 dark:bg-slate-900 p-4 rounded-md grid gap-5 col-span-6 grid-cols-6 items-center'>
+			<Link
+				href={`/quizzes/${quiz.id}`}
+				className='col-span-2'>
+				<div className='flex gap-2 items-center '>
+					<h1>{quiz.name}</h1>
+					{quiz.visibility === 'Private' && (
+						<Lock
+							size={12}
+							className='text-sm text-slate-500'
+						/>
+					)}
+					{isFavorited && (
+						<Bookmark
+							className='text-yellow-500'
+							size={12}
+						/>
+					)}
 				</div>
-			</div>
-			<Accordion
-				type='single'
-				collapsible>
-				<AccordionItem value='item-1'>
-					<AccordionTrigger>Wrong options</AccordionTrigger>
-					<AccordionContent>
-						<div className='flex gap-2 flex-wrap'>
-							{quiz.options.map((option) => (
-								<span
-									key={option}
-									className='bg-slate-300 px-2 rounded-md'>
-									{option}
-								</span>
-							))}
-						</div>
-					</AccordionContent>
-				</AccordionItem>
-			</Accordion>
-			<div className='flex gap-5'>
-				<CreateQuiz
-					isEditing
-					quiz={quiz}
-				/>
-				{/* <Popover>
-					<PopoverTrigger className='bg-slate-300 dark:bg-slate-800 transition hover:bg-slate-200 dark:hover:bg-slate-700 text-primary px-4 py-2 rounded-md'>
-						Edit
-					</PopoverTrigger>
-					<PopoverContent className='w-fit'></PopoverContent>
-				</Popover> */}
-				<AlertDialog>
-					<AlertDialogTrigger className='bg-destructive text-primary-foreground px-4 py-2 rounded-md'>
-						Delete
-					</AlertDialogTrigger>
-					<AlertDialogContent>
-						<AlertDialogHeader>
-							<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-							<AlertDialogDescription>
-								This action cannot be undone. This will permanently delete the
-								quiz.
-							</AlertDialogDescription>
-						</AlertDialogHeader>
-						<AlertDialogFooter>
-							<AlertDialogCancel>Cancel</AlertDialogCancel>
-							<AlertDialogAction
-								onClick={() => {
-									api
-										.delete(`/quizzes/${quiz.id}`)
-										.then((res) => console.log(res.data))
-								}}>
-								Continue
-							</AlertDialogAction>
-						</AlertDialogFooter>
-					</AlertDialogContent>
-				</AlertDialog>
-			</div>
+				<p className='text-xs text-slate-500'>
+					Created:{' '}
+					{quiz.createdAt.toLocaleDateString(undefined, {
+						day: '2-digit',
+						month: 'short',
+						year: 'numeric',
+					})}
+				</p>
+			</Link>
+			<QuizEditorComponent
+				isEditing
+				quiz={quiz}
+			/>
+			<span>{quiz._count.questions}</span>
+			<span>
+				{quiz.updatedAt.toLocaleDateString(undefined, {
+					day: '2-digit',
+					month: 'short',
+					year: 'numeric',
+				})}
+			</span>
+			<Link
+				href={`/play/quiz/${quiz.id}`}
+				className='bg-blue-500 transition  hover:bg-blue-400 px-4 py-2 rounded-md text-slate-100 text-center'>
+				Play
+			</Link>
 		</div>
 	)
 }

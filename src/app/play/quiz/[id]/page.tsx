@@ -1,6 +1,6 @@
 'use client'
-import { Quiz } from '@prisma/client'
-import { api, shuffle } from '../../../../lib/utils'
+import { Question, Quiz } from '@prisma/client'
+import { api, shuffle, cn } from '../../../../lib/utils'
 // import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useMemo, useEffect, useState } from 'react'
@@ -8,6 +8,7 @@ import { ArrowLeft, StepBack, StepBackIcon } from 'lucide-react'
 import useSWR from 'swr'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Button } from '../../../../components/ui/button'
 
 export default function Play({}) {
 	const pathName = usePathname()
@@ -15,60 +16,96 @@ export default function Play({}) {
 	const [page, setPage] = useState(0)
 
 	const {
-		data: quizzes,
+		data: questions,
 		isLoading,
 		error,
-	} = useSWR<Quiz[]>(`/play-quiz/${pathName.slice(11)}?page=${page}`, (url) => {
-		return api.get(url).then((res) => {
-			return res.data.quizzes
-		})
-	})
+	} = useSWR<Question[]>(
+		`/play-quiz/${pathName.slice(11)}?page=${page}`,
+		(url) => {
+			return api.get(url).then((res) => {
+				return res.data.questions
+			})
+		},
+	)
 
 	const [selectedQuiz, setSelectedQuiz] = useState(0)
 	const [isAnswerCorrect, setIsAnswerCorrect] = useState<true | false | null>(
 		null,
 	)
-	const quiz = quizzes?.[selectedQuiz]
+	const question = questions?.[selectedQuiz]
 
 	/* TODO remove the new Set() */
-	const shuffledQuiz = useMemo(
+	const shuffledQuestion = useMemo(
 		() =>
 			shuffle(
-				Array.from(new Set([...(quiz?.options ?? []), quiz?.correctOption])),
+				Array.from(
+					new Set([...(question?.options ?? []), question?.correctOption]),
+				),
 			),
-		[quiz],
+		[question],
 	)
 
 	if (error) return 'Error :('
 	if (isLoading) return 'Loading...'
-	if (!quizzes) return '???'
-	if (!quiz) return 'No quizzes to learn'
+	if (!questions) return '???'
+	if (!question)
+		return (
+			<div className='mx-auto w-96 bg-slate-100 dark:bg-slate-900 p-5'>
+				<h1 className='text-2xl font-medium mb-3'>No questions remaining</h1>
+				<Link
+					className='flex gap-3 items-center'
+					href={'/'}>
+					<ArrowLeft size={16} /> Back
+				</Link>
+			</div>
+		)
 
-	if (selectedQuiz > quizzes.length) return "You've played all quizzes"
+	if (selectedQuiz > questions.length) return "You've played all quizzes"
 
 	const submitQuiz = async () => {
 		const res: { message: 'correct' | 'incorrect' } = await api
-			.post(`play-quiz/${quiz.id}`, { answer: selectedOption })
+			.post(`play-quiz/${question.id}`, { answer: selectedOption })
 			.then((res) => res.data)
-		console.log(res)
 		setIsAnswerCorrect(res.message === 'correct')
 	}
 
 	return (
-		<div className='mx-auto w-96 bg-slate-100 p-5'>
-			<h1 className='text-2xl font-medium mb-3'>{quiz.question}</h1>
-			<ul className='mb-5 space-y-2'>
-				{shuffledQuiz.map((option) => (
+		<div className=''>
+			<h1 className='text-2xl font-semibold'>Questions</h1>
+			<span className='text-sm'>
+				Question {selectedQuiz + 1} of {questions.length}
+			</span>
+			<h1 className='text-2xl font-medium mb-3'>{question.question}</h1>
+			<ul className='mb-5 flex flex-col gap-3 justify-stretch'>
+				{shuffledQuestion.map((option, index) => (
 					<li
-						className='flex items-center space-x-2'
-						key={option}>
+						className={`flex items-center space-x-2  ${
+							selectedOption === option && 'shadow-xl'
+						} p-2 rounded-md items-center bg-white`}
+						key={crypto.randomUUID()}>
 						<button
-							onClick={() => setSelectedOption(option)}
-							className='flex gap-3'>
+							disabled={!!isAnswerCorrect}
+							onClick={() => {
+								setIsAnswerCorrect(null)
+								setSelectedOption(option)
+							}}
+							className={`flex gap-3 w-full`}>
 							<div
-								className={`rounded-full ${
-									selectedOption === option ? 'bg-blue-500' : 'bg-slate-300'
-								} h-5 w-5`}></div>{' '}
+								className={cn(
+									`rounded-md p-5 flex justify-center items-center  h-5 w-5 bg-slate-200`,
+									{
+										'bg-slate-900 text-primary-foreground':
+											selectedOption === option,
+										'bg-red-500':
+											!isAnswerCorrect &&
+											selectedOption === option &&
+											isAnswerCorrect !== null,
+										'bg-green-500':
+											isAnswerCorrect && selectedOption === option,
+									},
+								)}>
+								{'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.at(index)}
+							</div>{' '}
 							<span>{option}</span>
 						</button>
 					</li>
@@ -79,22 +116,22 @@ export default function Play({}) {
 			)}
 			<div className='flex gap-3 items-center'>
 				{isAnswerCorrect ? (
-					<button
-						className='bg-blue-500 px-4 py-2 rounded-md text-primary-foreground disabled:opacity-50'
+					<Button
+						variant={'color'}
 						onClick={() => {
 							setSelectedOption(null)
 							setIsAnswerCorrect(null)
 							setSelectedQuiz((curr) => curr + 1)
 						}}>
 						Next Question
-					</button>
+					</Button>
 				) : (
-					<button
-						className='bg-blue-500 px-4 py-2 rounded-md text-primary-foreground disabled:opacity-50'
+					<Button
+						variant='color'
 						disabled={selectedOption === null}
 						onClick={submitQuiz}>
 						Submit
-					</button>
+					</Button>
 				)}
 				<Link
 					className='flex gap-3 items-center'

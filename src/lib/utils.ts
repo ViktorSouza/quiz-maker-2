@@ -10,7 +10,15 @@ export function cn(...inputs: ClassValue[]) {
 
 export const getCurrentUser = async () => {
 	const user = await getServerSession(authOptions)
-	return user?.user
+	return user?.user as
+		| ({
+				id: string
+		  } & {
+				name?: string | null
+				email?: string | null
+				image?: string | null
+		  })
+		| null
 }
 export const api = axios.create({ baseURL: process.env.NEXT_PUBLIC_API_URL })
 

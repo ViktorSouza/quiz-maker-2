@@ -6,52 +6,67 @@ generator client {
 }
 
 model User {
-  id             String           @id @default(auto()) @map("_id") @db.ObjectId
-  email          String           @unique
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  name           String
-  quizzes        Quiz[]
-  UserPlay       UserPlay[]
-  QuizCollection QuizCollection[]
+  id                 String     @id @default(auto()) @map("_id") @db.ObjectId
+  email              String     @unique
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  name               String
+  favoriteQuizzesIds String[]   @db.ObjectId
+  favoriteQuizzes    Quiz[]     @relation("favorite quiz", fields: [favoriteQuizzesIds], references: [id])
+  questions          Question[]
+  UserPlay           UserPlay[]
+  Quiz               Quiz[]     @relation("user's quiz")
+}
+
+model Question {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  User          User?      @relation(fields: [userId], references: [id])
+  userId        String     @db.ObjectId
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  question      String
+  explanation   String?
+  options       String[]
+  correctOption String
+  UserPlay      UserPlay[]
+  Quiz          Quiz?      @relation(fields: [quizId], references: [id])
+  quizId        String     @db.ObjectId
+}
+
+enum Visibility {
+  Private
+  Public
 }
 
 model Quiz {
-  id               String          @id @default(auto()) @map("_id") @db.ObjectId
-  User             User?           @relation(fields: [userId], references: [id])
-  userId           String?         @db.ObjectId
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  question         String
-  options          String[]
-  correctOption    String
-  UserPlay         UserPlay[]
-  QuizCollection   QuizCollection? @relation(fields: [quizCollectionId], references: [id])
-  quizCollectionId String?         @db.ObjectId
-}
-
-model QuizCollection {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   name        String
-  description String
+  visibility  Visibility
+  description String?
   tags        String[]
-  User        User?    @relation(fields: [userId], references: [id])
-  userId      String   @db.ObjectId
-  quizzes     Quiz[]
+
+  User      User?      @relation("user's quiz", fields: [userId], references: [id])
+  userId    String     @db.ObjectId
+  questions Question[]
+  UserPlay  UserPlay[]
+  usersIds  String[]   @db.ObjectId
+  users     User[]     @relation("favorite quiz", fields: [usersIds], references: [id])
 }
 
 model UserPlay {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   User           User?    @relation(fields: [userId], references: [id])
-  Quiz           Quiz     @relation(fields: [quizId], references: [id])
-  quizId         String   @db.ObjectId
+  Question       Question @relation(fields: [questionId], references: [id])
+  questionId     String   @db.ObjectId
   userId         String   @db.ObjectId
   selectedOption String
   correctOption  String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  Quiz           Quiz?    @relation(fields: [quizId], references: [id])
+  quizId         String?  @db.ObjectId
 }
 
 datasource db {

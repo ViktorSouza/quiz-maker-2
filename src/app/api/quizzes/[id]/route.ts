@@ -1,53 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import { prisma } from '../../../../lib/db'
 import { getCurrentUser } from '../../../../lib/utils'
-import { z } from 'zod'
-import { Quiz } from '@prisma/client'
 
-export async function DELETE(
-	req: NextRequest,
-	{ params }: { params: { id: string } },
-) {
-	//TODO activate this
-	//prisma.quiz.delete({
-	// 	where: {
-	// 		id: params.id,
-	// 	},
-	// })
-	const quiz = await prisma.quiz.findUnique({
-		where: {
-			id: params.id,
-		},
+//TODO add meaningful messages here :D
+const patchSchema = z
+	.object({
+		description: z.string().or(z.null()).optional(),
+		visibility: z.enum(['Public', 'Private']),
+		name: z.string().nonempty(),
+		tags: z.array(z.string().nonempty()),
 	})
-
-	return NextResponse.json({
-		message: 'OK',
-		quiz,
-	})
-}
-
-export async function GET(
-	req: NextRequest,
-	{ params }: { params: { id: string } },
-) {
-	const quiz = await prisma.quiz.findUnique({
-		where: {
-			id: params.id,
-		},
-	})
-
-	return NextResponse.json({
-		quiz,
-	})
-}
-
-const patchSchema = z.object({
-	question: z.string().nonempty(),
-	// quizCollectionId: z.string().nonempty(),
-	correctOption: z.string().nonempty(),
-	options: z.array(z.string().nonempty()),
-	// tags: z.array(z.string().nonempty()),
-})
+	.partial()
 
 export async function PATCH(
 	req: Request,

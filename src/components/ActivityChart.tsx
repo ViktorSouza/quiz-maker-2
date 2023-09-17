@@ -1,5 +1,5 @@
 'use client'
-import { Quiz, UserPlay } from '@prisma/client'
+import { Question, Quiz, UserPlay } from '@prisma/client'
 import colors from 'tailwindcss/colors'
 import {
 	Chart as ChartJS,
@@ -31,7 +31,7 @@ ChartJS.register(
 export default function ActivityChart({
 	activities,
 }: {
-	activities: (UserPlay & { Quiz: Quiz })[]
+	activities: (UserPlay & { Question: Question })[]
 }) {
 	const dateFormat: Intl.DateTimeFormatOptions = {
 		day: '2-digit',
@@ -42,7 +42,7 @@ export default function ActivityChart({
 	const oneDay = 1000 * 60 * 60 * 24
 
 	const days: [key: string, value: number][] = []
-	const amountOfDays = 30
+	const amountOfDays = 7
 
 	for (let day = 0; day <= amountOfDays; day++) {
 		days.push([
@@ -73,7 +73,7 @@ export default function ActivityChart({
 		scales: {
 			x: {
 				grid: { display: false },
-				ticks: { maxTicksLimit: 5, color: colors.slate[500] },
+				ticks: { maxTicksLimit: 15, color: colors.slate[500] },
 			},
 			y: {
 				grid: { display: false },
@@ -90,12 +90,12 @@ export default function ActivityChart({
 				data: Object.values(uga),
 				backgroundColor: colors.blue[500],
 				borderColor: colors.blue[500],
-				borderRadius: 10,
+				borderRadius: 5,
 			},
 		],
 	}
 	return (
-		<div>
+		<div className='w-full bg-slate-100 p-4 dark:bg-slate-900 rounded-md'>
 			<Bar
 				data={data}
 				options={options}

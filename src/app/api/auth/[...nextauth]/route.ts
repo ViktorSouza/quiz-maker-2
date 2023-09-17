@@ -35,7 +35,7 @@ export const authOptions: AuthOptions = {
 			const userData = await prisma.user.findUnique({
 				where: { email: token?.email ?? '' },
 			})
-			session.user = userData
+			if (userData) session.user = userData
 			return session
 		},
 	},

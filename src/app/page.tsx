@@ -1,12 +1,13 @@
-import { EditCollection } from '@/components/EditCollection'
+import QuizCard from '@/components/QuizCard'
 import Image from 'next/image'
-import CreateQuiz from '@/components/CreateQuiz'
-import { Prisma, Quiz, UserPlay } from '@prisma/client'
-import { api, getCurrentUser } from '../lib/utils'
-import { QuizCard } from '../components/QuizCard'
+import QuestionEditorComponent from '@/components/QuestionEditorComponent'
+import { api, getCurrentUser } from '@/lib/utils'
+import { QuestionCard } from '../components/QuestionCard'
 import ActivityChart from '@/components/ActivityChart'
 import Link from 'next/link'
-import { prisma } from '../lib/db'
+import { prisma } from '@/lib/db'
+import QuizEditorComponent from '@/components/QuizEditorComponent'
+import PaginationServer from '@/components/PaginationServer'
 
 export default async function Home({
 	searchParams,
@@ -15,85 +16,82 @@ export default async function Home({
 }) {
 	const page = Number(searchParams.page || '0') || 0
 	const user = await getCurrentUser()
-	const activities = await prisma.userPlay.findMany({
-		where: {
-			userId: user?.id ?? '',
-		},
-		orderBy: { createdAt: 'desc' },
-		include: { Quiz: true },
-	})
-	console.log(activities)
-	const quizzes = await prisma.quiz.findMany({
-		where: {
-			userId: user?.id ?? '',
-		},
-		skip: page * 10,
-		take: 10,
-	})
+	if (!user) return 'You must be logged in'
 
-	const collections = await prisma.quizCollection.findMany({
+	const activities = user?.id
+		? await prisma.userPlay.findMany({
+				where: {
+					userId: user.id,
+				},
+				orderBy: { createdAt: 'desc' },
+				include: { Question: true },
+		  })
+		: undefined
+
+	const quiz = await prisma.quiz.findMany({
 		where: {
-			userId: user?.id,
+			OR: [
+				{
+					userId: user?.id,
+				},
+				{
+					users: {
+						some: { id: user?.id },
+					},
+				},
+			],
 		},
+		skip: page,
+
+		take: 10,
 		include: {
 			_count: true,
 		},
 	})
+	const totalPages = Math.floor(
+		((await prisma.quiz.count({ where: { userId: user?.id } })) ?? 0) / 10,
+	)
 
 	return (
 		<div className='grid grid-cols-8 gap-3'>
-			<h1 className='text-2xl font-semibold col-span-6'>Collections</h1>
-			<div className='flex items-stretch gap-3 col-span-2'>
-				<CreateQuiz isEditing={false} />
+			<h1 className='text-2xl font-semibold col-span-2'>Quizzes</h1>
+			<div className='flex items-stretch gap-3 col-span-6 justify-end'>
+				<QuestionEditorComponent />
+				<QuizEditorComponent />
 				<Link
 					href={'attempts'}
-					className='bg-slate-300 dark:bg-slate-800 transition hover:bg-slate-200 dark:hover:bg-slate-700 text-primary px-4 py-2 rounded-md'>
+					className='bg-slate-200 text-sm font-medium dark:bg-slate-900 transition hover:bg-slate-300  dark:hover:bg-slate-700 text-primary px-4 py-2 rounded-md'>
 					My attempts
 				</Link>
 			</div>
 
-			<section className='col-span-6 my-5 grid grid-cols-6 gap-5'>
-				<span className='text-sm font-light col-span-3 pl-4'>Collection</span>
-				<span className='text-sm font-light'>Questions</span>
-				<span className='text-sm font-light'>Updated</span>
-
-				{collections.map((collection) => (
-					<div
-						key={collection.id}
-						className='bg-slate-200 dark:bg-slate-900 px-4  py-1 rounded-md grid gap-5 col-span-6 grid-cols-6 items-center'>
-						<Link
-							href={`/collections/${collection.id}`}
-							className='col-span-2'>
-							<h1>{collection.name}</h1>
-							<p className='text-xs'>
-								Created:{' '}
-								{collection.createdAt.toLocaleDateString(undefined, {
-									day: '2-digit',
-									month: 'short',
-									year: 'numeric',
-								})}
-							</p>
-						</Link>
-						<EditCollection collection={collection} />
-						<span>{collection._count.quizzes}</span>
-						<span>
-							{collection.updatedAt.toLocaleDateString(undefined, {
-								day: '2-digit',
-								month: 'short',
-								year: 'numeric',
-							})}
-						</span>
-						<Link
-							href={`/play/quiz/${collection.id}`}
-							className='bg-blue-500 transition  hover:bg-blue-400 px-4 py-2 rounded-md text-slate-100 text-center'>
-							Play
-						</Link>
-					</div>
-				))}
+			<section className='col-span-6'>
+				<section className='col-span-6 grid grid-cols-6 text-slate-500'>
+					<span className='text-sm font-medium col-span-3 pl-4'>Quiz</span>
+					<span className='text-sm font-medium'>Questions</span>
+					<span className='text-sm font-medium'>Updated</span>
+				</section>
+				<section className='col-span-6 my-5 grid grid-cols-6 gap-5'>
+					{quiz.map((quiz) => (
+						<QuizCard
+							isFavorited={quiz.usersIds.includes(user.id)}
+							key={quiz.id}
+							quiz={quiz}
+						/>
+					))}
+				</section>
+				<PaginationServer
+					page={page}
+					totalPages={totalPages}
+				/>
 			</section>
-			<section className='col-span-2'>
-				<h1 className='text-2xl font-semibold'>Your activities</h1>
-				<ActivityChart activities={activities} />
+			<section className='col-span-2 '>
+				{activities && (
+					<>
+						<h1 className='text-2xl font-semibold'>Your activities</h1>
+						<ActivityChart activities={activities} />
+					</>
+				)}
 			</section>
 		</div>
 	)

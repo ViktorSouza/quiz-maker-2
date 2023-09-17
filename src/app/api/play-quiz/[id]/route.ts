@@ -15,28 +15,28 @@ export async function POST(
 	const user = await getCurrentUser()
 	if (!user) return NextResponse.json({}, { status: 401 })
 
-	const quiz = await prisma.quiz.findUnique({
+	const question = await prisma.question.findUnique({
 		where: {
 			id: params.id,
 		},
 	})
 
-	if (!quiz) return NextResponse.json({}, { status: 404 })
+	if (!question) return NextResponse.json({}, { status: 404 })
 
-	if (![...quiz.options, quiz?.correctOption].includes(body.answer))
+	if (![...question.options, question?.correctOption].includes(body.answer))
 		return NextResponse.json({}, { status: 400 })
 
 	const userPlay = await prisma.userPlay.create({
 		data: {
-			correctOption: quiz?.correctOption,
+			correctOption: question?.correctOption,
 			selectedOption: body.answer,
 			userId: user?.id,
-			quizId: quiz?.id,
+			questionId: question?.id,
 		},
 	})
 
-	if (quiz?.correctOption === body.answer) {
-		return NextResponse.json({ message: 'correct', userPlay, bah: 'sim' })
+	if (question?.correctOption === body.answer) {
+		return NextResponse.json({ message: 'correct', userPlay })
 	} else {
 		return NextResponse.json({ message: 'incorrect' })
 	}
@@ -49,13 +49,14 @@ export async function GET(
 	const page = Number(req.nextUrl.searchParams.get('page')) || 0
 	const user = await getCurrentUser()
 
-	const quizzes = await prisma.quiz.findMany({
+	const questions = await prisma.question.findMany({
 		where: {
 			userId: user?.id,
-			quizCollectionId: params.id,
+			quizId: params.id,
 		},
-		skip: page * 10,
-		take: 10,
+		// skip: page * 10,
+		// take: 10,
 	})
-	return NextResponse.json({ quizzes })
+	console.log(questions)
+	return NextResponse.json({ questions })
 }
