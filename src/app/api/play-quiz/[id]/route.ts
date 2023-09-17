@@ -51,8 +51,18 @@ export async function GET(
 
 	const questions = await prisma.question.findMany({
 		where: {
-			userId: user?.id,
-			quizId: params.id,
+			OR: [
+				{
+					userId: user?.id,
+					quizId: params.id,
+				},
+				{
+					quizId: params.id,
+					Quiz: {
+						visibility: 'Public',
+					},
+				},
+			],
 		},
 		// skip: page * 10,
 		// take: 10,
