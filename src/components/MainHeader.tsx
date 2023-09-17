@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ToggleTheme } from './ToggleTheme'
 import { Grip, LogOut, User } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
+import SearchBar from './SearchBar'
 export default function MainHeader() {
 	const session = useSession()
 	return (
@@ -14,6 +15,7 @@ export default function MainHeader() {
 						Quiz Maker 2.0
 					</h1>
 				</Link>
+				<SearchBar />
 				<div className='flex gap-3'>
 					{session.data?.user ? (
 						<div className='flex gap-3 items-center'>
