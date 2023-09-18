@@ -31,9 +31,9 @@ import { useSession } from 'next-auth/react'
 
 export function QuestionCard({ question }: { question: Question }) {
 	const user = useSession()
-	const { data: quizAccurancy } = useSWR(
-		`questions/accurancy/${question.id}`,
-		(url: string) => api.get(url).then((res) => res.data.accurancy),
+	const { data: quizAccuracy } = useSWR(
+		`questions/accuracy/${question.id}`,
+		(url: string) => api.get(url).then((res) => res.data.accuracy),
 		{ fallbackData: 0 },
 	)
 	return (
@@ -44,13 +44,13 @@ export function QuestionCard({ question }: { question: Question }) {
 				Answer: <span className='font-medium'>{question.correctOption}</span>
 			</p>
 			<div>
-				<span>Accurancy</span>
+				<span>Accuracy</span>
 
 				<div className='w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full'>
 					<div
 						className='bg-blue-500 rounded-full h-full'
 						style={{
-							width: `${quizAccurancy * 100}%`,
+							width: `${quizAccuracy * 100}%`,
 						}}></div>
 				</div>
 			</div>

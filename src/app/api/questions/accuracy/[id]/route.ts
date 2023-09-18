@@ -21,5 +21,5 @@ export async function GET(
 			questionId: id,
 		},
 	})
-	return NextResponse.json({ accurancy: correctQuizzes / allQuizzes })
+	return NextResponse.json({ accuracy: correctQuizzes / allQuizzes })
 }
