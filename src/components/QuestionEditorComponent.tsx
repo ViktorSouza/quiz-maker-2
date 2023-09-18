@@ -26,6 +26,7 @@ import {
 import { Question, Quiz } from '@prisma/client'
 import QuizEditorComponent from './QuizEditorComponent'
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
+import { useSession } from 'next-auth/react'
 type Inputs = {
 	options: string[]
 	correctOption: string
@@ -57,6 +58,8 @@ export default function QuestionEditorComponent({
 		{ keepPreviousData: true, fallbackData: [] },
 	)
 
+	const user = useSession()
+
 	const { fields, append, remove } = useFieldArray({
 		//@ts-ignore
 		name: 'options',
@@ -78,8 +81,9 @@ export default function QuestionEditorComponent({
 	return (
 		<Dialog>
 			<DialogTrigger
+				disabled={question?.userId !== user.data?.user.id}
 				className={cn(
-					'bg-slate-300 text-sm font-medium dark:bg-slate-800 transition hover:bg-slate-200 dark:hover:bg-slate-700 p-2 px-4 rounded-md w-max',
+					'bg-slate-300 text-sm font-medium dark:bg-slate-800 transition hover:bg-slate-200 dark:hover:bg-slate-700 p-2 px-4 rounded-md w-max disabled:opacity-50',
 					{ '!bg-blue-500 text-white': !isEditing },
 				)}>
 				{isEditing ? 'Edit Question' : 'New Question'}

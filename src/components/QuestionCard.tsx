@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/popover'
 import { Question, Quiz } from '@prisma/client'
 import useSWR from 'swr'
-import { api } from '../lib/utils'
+import { api, cn } from '../lib/utils'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -26,9 +26,11 @@ import {
 	AccordionTrigger,
 } from '@/components/ui/accordion'
 import QuestionEditorComponent from './QuestionEditorComponent'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { useSession } from 'next-auth/react'
 
 export function QuestionCard({ question }: { question: Question }) {
+	const user = useSession()
 	const { data: quizAccurancy } = useSWR(
 		`questions/accurancy/${question.id}`,
 		(url: string) => api.get(url).then((res) => res.data.accurancy),
@@ -62,7 +64,7 @@ export function QuestionCard({ question }: { question: Question }) {
 							{question.options.map((option) => (
 								<span
 									key={option}
-									className='bg-slate-300 px-2 rounded-md'>
+									className='bg-slate-200 px-4 py-2 dark:bg-slate-800 rounded-md'>
 									{option}
 								</span>
 							))}
@@ -76,8 +78,10 @@ export function QuestionCard({ question }: { question: Question }) {
 					question={question}
 				/>
 				<AlertDialog>
-					<AlertDialogTrigger>
-						<Button variant={'destructive'}>Delete</Button>
+					<AlertDialogTrigger
+						className={cn(buttonVariants({ variant: 'destructive' }))}
+						disabled={question?.userId !== user.data?.user.id}>
+						Delete
 					</AlertDialogTrigger>
 					<AlertDialogContent>
 						<AlertDialogHeader>
@@ -90,6 +94,7 @@ export function QuestionCard({ question }: { question: Question }) {
 						<AlertDialogFooter>
 							<AlertDialogCancel>Cancel</AlertDialogCancel>
 							<AlertDialogAction
+								disabled={true}
 								className='bg-red-500 text-slate-100'
 								onClick={() => {
 									api.delete(`/questions/${question.id}`)
