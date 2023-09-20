@@ -81,7 +81,7 @@ export default function Play({}) {
 					<li
 						className={`flex items-center space-x-2  ${
 							selectedOption === option && 'shadow-xl'
-						} p-2 rounded-md items-center bg-white`}
+						} p-2 rounded-md items-center bg-white dark:bg-slate-900`}
 						key={crypto.randomUUID()}>
 						<button
 							disabled={!!isAnswerCorrect}
@@ -92,15 +92,15 @@ export default function Play({}) {
 							className={`flex gap-3 w-full`}>
 							<div
 								className={cn(
-									`rounded-md p-5 flex justify-center items-center  h-5 w-5 bg-slate-200`,
+									`rounded-md p-5 flex justify-center items-center  h-5 w-5 bg-slate-200 dark:bg-slate-800`,
 									{
-										'bg-slate-900 text-primary-foreground':
+										'bg-slate-900 text-primary-foreground dark:bg-slate-100 dark:bg-primary':
 											selectedOption === option,
-										'bg-red-500':
+										'!bg-red-500':
 											!isAnswerCorrect &&
 											selectedOption === option &&
 											isAnswerCorrect !== null,
-										'bg-green-500':
+										'!bg-green-500':
 											isAnswerCorrect && selectedOption === option,
 									},
 								)}>

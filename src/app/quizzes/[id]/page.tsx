@@ -28,12 +28,29 @@ export default async function Quiz({
 	const quiz = await prisma.quiz.findUnique({
 		where: {
 			id: params.id,
+
+			OR: [
+				{
+					visibility: 'Private',
+					userId: user?.id,
+				},
+				{
+					visibility: 'Public',
+				},
+			],
 		},
 		include: {
 			questions: { skip: page, take: 10 },
 			_count: { select: { questions: true } },
 		},
 	})
+
+	const plays = await prisma.userPlay.count({
+		where: {
+			quizId: searchParams.id,
+		},
+	})
+
 	const totalPages = Math.floor((quiz?._count.questions ?? 0) / 10)
 
 	if (!quiz) return notFound()
@@ -51,8 +68,8 @@ export default async function Quiz({
 				<BreadCrumbs breadCrumbs={breadCrumbs} />
 				<GoBack />
 			</div>
-
 			<h1 className='text-2xl font-semibold col-span-6'>Questions</h1>
+			{plays} Plays
 			<div className='grid gap-2 grid-cols-4'>
 				{quiz.questions.length === 0
 					? 'No questions found'

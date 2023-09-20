@@ -48,6 +48,7 @@ export default async function Home({
 			_count: true,
 		},
 	})
+	console.log(await prisma.quizPlay.findFirst())
 	const totalPages = Math.floor(
 		((await prisma.quiz.count({ where: { userId: user?.id } })) ?? 0) / 10,
 	)

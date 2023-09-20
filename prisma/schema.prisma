@@ -16,6 +16,7 @@ model User {
   questions          Question[]
   UserPlay           UserPlay[]
   Quiz               Quiz[]     @relation("user's quiz")
+  QuizPlay           QuizPlay[]
 }
 
 model Question {
@@ -53,20 +54,35 @@ model Quiz {
   UserPlay  UserPlay[]
   usersIds  String[]   @db.ObjectId
   users     User[]     @relation("favorite quiz", fields: [usersIds], references: [id])
+  QuizPlay  QuizPlay[]
+}
+
+model QuizPlay {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  quiz         Quiz       @relation(fields: [quizId], references: [id])
+  quizId       String     @db.ObjectId
+  User         User?      @relation(fields: [userId], references: [id])
+  userId       String     @db.ObjectId
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  userPlaysIds String[]   @db.ObjectId
+  UserPlay     UserPlay[]
 }
 
 model UserPlay {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  User           User?    @relation(fields: [userId], references: [id])
-  Question       Question @relation(fields: [questionId], references: [id])
-  questionId     String   @db.ObjectId
-  userId         String   @db.ObjectId
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  User           User?     @relation(fields: [userId], references: [id])
+  Question       Question  @relation(fields: [questionId], references: [id])
+  questionId     String    @db.ObjectId
+  userId         String    @db.ObjectId
   selectedOption String
   correctOption  String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  Quiz           Quiz?    @relation(fields: [quizId], references: [id])
-  quizId         String?  @db.ObjectId
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  Quiz           Quiz?     @relation(fields: [quizId], references: [id])
+  quizId         String    @db.ObjectId
+  QuizPlay       QuizPlay? @relation(fields: [quizPlayId], references: [id])
+  quizPlayId     String    @db.ObjectId
 }
 
 datasource db {

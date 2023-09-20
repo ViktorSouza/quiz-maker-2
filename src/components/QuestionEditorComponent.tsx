@@ -81,7 +81,7 @@ export default function QuestionEditorComponent({
 	return (
 		<Dialog>
 			<DialogTrigger
-				disabled={question?.userId !== user.data?.user.id}
+				disabled={question?.userId !== user.data?.user.id && isEditing}
 				className={cn(
 					'bg-slate-300 text-sm font-medium dark:bg-slate-800 transition hover:bg-slate-200 dark:hover:bg-slate-700 p-2 px-4 rounded-md w-max disabled:opacity-50',
 					{ '!bg-blue-500 text-white': !isEditing },
@@ -92,7 +92,7 @@ export default function QuestionEditorComponent({
 				<form
 					onSubmit={handleSubmit(onSubmit)}
 					className='flex flex-col max-h-screen gap-5 overflow-y-scroll'>
-					<h1 className='col-span-6 text-2xl font-semibold'>Create Quiz</h1>
+					<h1 className='col-span-6 text-2xl font-semibold'>Create Question</h1>
 					<div className='flex flex-col'>
 						<label
 							htmlFor='question'
@@ -234,7 +234,7 @@ export default function QuestionEditorComponent({
 						</button>
 					</div>
 					<button className='flex justify-center w-full gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground'>
-						{isEditing ? 'Edit Quiz' : 'Create Quiz'}
+						{isEditing ? 'Edit Question' : 'Create Question'}
 					</button>
 					<button
 						className='px-4 py-2 bg-red-500 rounded-md text-primary-foreground dark:text-primary'

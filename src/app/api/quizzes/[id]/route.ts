@@ -26,9 +26,13 @@ export async function PATCH(
 			},
 			{ status: 400 },
 		)
+
 	const quiz = await prisma.quiz.update({
 		where: { id: params.id, userId: user.id },
-		data: body,
+		data: {
+			...body,
+			//TODO remove the favoriteQuiz relation if the user private the quiz
+		},
 	})
 	return NextResponse.json({ quiz })
 }
