@@ -5,8 +5,10 @@ import { Bookmark, Lock } from 'lucide-react'
 
 export default function QuizCard({
 	quiz,
+	isQuizAlreadyPlayed,
 	isFavorited,
 }: {
+	isQuizAlreadyPlayed: boolean
 	isFavorited: boolean
 	quiz: Quiz & {
 		_count: {
@@ -61,7 +63,7 @@ export default function QuizCard({
 			<Link
 				href={`/play/quiz/${quiz.id}`}
 				className='bg-blue-500 transition  hover:bg-blue-400 px-4 py-2 rounded-md text-slate-100 text-center'>
-				Play
+				{isQuizAlreadyPlayed ? 'Continue' : 'Play'}
 			</Link>
 		</div>
 	)

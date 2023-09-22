@@ -7,33 +7,30 @@ import { useMemo, useEffect, useState } from 'react'
 import { ArrowLeft, StepBack, StepBackIcon } from 'lucide-react'
 import useSWR from 'swr'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Button } from '../../../../components/ui/button'
 
 export default function Play({}) {
 	const pathName = usePathname()
 	const [selectedOption, setSelectedOption] = useState<string | null>(null)
 	const [page, setPage] = useState(0)
+	const router = useRouter()
 
-	const {
-		data: questions,
-		isLoading,
-		error,
-	} = useSWR<Question[]>(
-		`/play-quiz/${pathName.slice(11)}?page=${page}`,
-		(url) => {
-			return api.get(url).then((res) => {
-				return res.data.questions
-			})
-		},
-	)
+	const { data, isLoading, error } = useSWR<{
+		question: Question
+		remaining: number
+	}>(`/play-quiz/${pathName.slice(11)}?page=${page}`, (url) => {
+		return api.get(url).then((res) => {
+			return res.data
+		})
+	})
 
 	const [selectedQuiz, setSelectedQuiz] = useState(0)
 	const [isAnswerCorrect, setIsAnswerCorrect] = useState<true | false | null>(
 		null,
 	)
-	const question = questions?.[selectedQuiz]
 
+	let question = data?.question
 	/* TODO remove the new Set() */
 	const shuffledQuestion = useMemo(
 		() =>
@@ -47,8 +44,7 @@ export default function Play({}) {
 
 	if (error) return 'Error :('
 	if (isLoading) return 'Loading...'
-	if (!questions) return '???'
-	if (!question)
+	if (!question?.id || !data?.remaining)
 		return (
 			<div className='mx-auto w-96 bg-slate-100 dark:bg-slate-900 p-5'>
 				<h1 className='text-2xl font-medium mb-3'>No questions remaining</h1>
@@ -57,14 +53,23 @@ export default function Play({}) {
 					href={'/'}>
 					<ArrowLeft size={16} /> Back
 				</Link>
+				<Button
+					variant={'color'}
+					onClick={() => {
+						api.post(`/quizzes/${pathName.slice(11)}/session`).then(() => {
+							router.refresh()
+						})
+					}}>
+					New Round
+				</Button>
 			</div>
 		)
 
-	if (selectedQuiz > questions.length) return "You've played all quizzes"
+	if (selectedQuiz > data?.remaining) return "You've played all quizzes"
 
 	const submitQuiz = async () => {
 		const res: { message: 'correct' | 'incorrect' } = await api
-			.post(`play-quiz/${question.id}`, { answer: selectedOption })
+			.post(`play-quiz/${question?.id}`, { answer: selectedOption })
 			.then((res) => res.data)
 		setIsAnswerCorrect(res.message === 'correct')
 	}
@@ -73,7 +78,7 @@ export default function Play({}) {
 		<div className=''>
 			<h1 className='text-2xl font-semibold'>Questions</h1>
 			<span className='text-sm'>
-				Question {selectedQuiz + 1} of {questions.length}
+				Question {selectedQuiz + 1} of {data?.remaining}
 			</span>
 			<h1 className='text-2xl font-medium mb-3'>{question.question}</h1>
 			<ul className='mb-5 flex flex-col gap-3 justify-stretch'>

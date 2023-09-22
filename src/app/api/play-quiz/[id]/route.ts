@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '../../../../lib/db'
 import { z } from 'zod'
 import { getCurrentUser } from '../../../../lib/utils'
+import { Prisma, UserPlay } from '@prisma/client'
 
 const schema = z.object({
 	answer: z.string().nonempty('Please, provide the answer'),
@@ -18,20 +19,43 @@ export async function POST(
 		where: {
 			id: params.id,
 		},
+		include: {
+			Quiz: {
+				include: {
+					_count: true,
+				},
+			},
+		},
 	})
 
 	if (!question) return NextResponse.json({}, { status: 404 })
+
 	let quizPlay = await prisma.quizPlay.findFirst({
 		where: {
 			userId: user.id,
 			quizId: question.quizId,
 		},
+		orderBy: {
+			id: 'desc',
+		},
+		include: {
+			UserPlay: true,
+			_count: true,
+		},
 	})
-	if (!quizPlay) {
+
+	if (
+		!quizPlay ||
+		question.Quiz?._count.questions === quizPlay._count.UserPlay
+	) {
 		quizPlay = await prisma.quizPlay.create({
 			data: {
 				userId: user.id,
 				quizId: question.quizId,
+			},
+			include: {
+				UserPlay: true,
+				_count: true,
 			},
 		})
 	}
@@ -75,22 +99,33 @@ export async function GET(
 	const user = await getCurrentUser()
 	if (!user) return NextResponse.json({}, { status: 401 })
 
-	const quizPlay = await prisma.quizPlay.findFirst({
+	let quizPlay = await prisma.quizPlay.findFirst({
 		where: {
 			userId: user.id,
 			quizId: params.id,
 		},
+		orderBy: {
+			id: 'desc',
+		},
+		include: {
+			UserPlay: true,
+			_count: true,
+			quiz: { include: { _count: true } },
+		},
 	})
+
 	console.log(user.id, params.id)
 	console.log(quizPlay?.id, params.id)
 
-	const questions = await prisma.question.findMany({
+	const findQuestionArgs: Prisma.QuestionFindFirstArgs = {
 		where: {
 			UserPlay: {
-				//I actally don't know how this is working, but I will not change anything😳
+				//I actually don't know how this is working, but I will not change anything😳
 				every: {
 					OR: [
-						{ quizPlayId: { not: quizPlay?.id } }, // Exclude questions from the current quiz play
+						{
+							quizPlayId: { not: quizPlay?.id },
+						},
 						{ userId: { not: user.id } }, // Exclude questions played by the user
 					],
 				},
@@ -109,8 +144,25 @@ export async function GET(
 				},
 			],
 		},
-		// skip: page * 10,
-		// take: 10,
-	})
-	return NextResponse.json({ questions })
+	}
+
+	const question = await prisma.question.findFirst(findQuestionArgs)
+	const remaining = await prisma.question.count(
+		findQuestionArgs as Prisma.QuestionCountArgs,
+	)
+
+	if (!quizPlay) {
+		await prisma.quizPlay.create({
+			data: {
+				userId: user.id,
+				quizId: question?.quizId ?? '',
+			},
+			include: {
+				UserPlay: true,
+				_count: true,
+			},
+		})
+	}
+
+	return NextResponse.json({ question, remaining })
 }

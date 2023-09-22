@@ -73,8 +73,16 @@ export default async function Home({
 					<span className='text-sm font-medium'>Updated</span>
 				</section>
 				<section className='col-span-6 my-5 grid grid-cols-6 gap-5'>
-					{quiz.map((quiz) => (
+					{quiz.map(async (quiz) => (
 						<QuizCard
+							isQuizAlreadyPlayed={
+								!!(await prisma.quizPlay.count({
+									where: {
+										userId: user.id,
+										quizId: quiz.id,
+									},
+								}))
+							}
 							isFavorited={quiz.usersIds.includes(user.id)}
 							key={quiz.id}
 							quiz={quiz}
