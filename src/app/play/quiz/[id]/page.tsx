@@ -16,7 +16,7 @@ export default function Play({}) {
 	const [page, setPage] = useState(0)
 	const router = useRouter()
 
-	const { data, isLoading, error } = useSWR<{
+	const { data, isLoading, error, mutate } = useSWR<{
 		question: Question
 		remaining: number
 	}>(`/play-quiz/${pathName.slice(11)}?page=${page}`, (url) => {
@@ -57,7 +57,7 @@ export default function Play({}) {
 					variant={'color'}
 					onClick={() => {
 						api.post(`/quizzes/${pathName.slice(11)}/session`).then(() => {
-							router.refresh()
+							mutate()
 						})
 					}}>
 					New Round
@@ -126,7 +126,7 @@ export default function Play({}) {
 						onClick={() => {
 							setSelectedOption(null)
 							setIsAnswerCorrect(null)
-							setSelectedQuiz((curr) => curr + 1)
+							mutate()
 						}}>
 						Next Question
 					</Button>

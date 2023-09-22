@@ -35,10 +35,12 @@ type Inputs = {
 }
 export default function QuestionEditorComponent({
 	isEditing = false,
+	buttonClassName,
 	question,
-}:
+}: (
 	| { isEditing: true; question: Question }
-	| { isEditing?: false; question?: undefined }) {
+	| { isEditing?: false; question?: undefined }
+) & { buttonClassName?: string }) {
 	const {
 		register,
 		handleSubmit,
@@ -85,6 +87,7 @@ export default function QuestionEditorComponent({
 				className={cn(
 					'bg-slate-300 text-sm font-medium dark:bg-slate-800 transition hover:bg-slate-200 dark:hover:bg-slate-700 p-2 px-4 rounded-md w-max disabled:opacity-50',
 					{ '!bg-blue-500 text-white': !isEditing },
+					buttonClassName,
 				)}>
 				{isEditing ? 'Edit Question' : 'New Question'}
 			</DialogTrigger>

@@ -48,7 +48,6 @@ export default async function Home({
 			_count: true,
 		},
 	})
-	console.log(await prisma.quizPlay.findFirst())
 	const totalPages = Math.floor(
 		((await prisma.quiz.count({ where: { userId: user?.id } })) ?? 0) / 10,
 	)
@@ -73,21 +72,40 @@ export default async function Home({
 					<span className='text-sm font-medium'>Updated</span>
 				</section>
 				<section className='col-span-6 my-5 grid grid-cols-6 gap-5'>
-					{quiz.map(async (quiz) => (
-						<QuizCard
-							isQuizAlreadyPlayed={
-								!!(await prisma.quizPlay.count({
-									where: {
-										userId: user.id,
-										quizId: quiz.id,
-									},
-								}))
-							}
-							isFavorited={quiz.usersIds.includes(user.id)}
-							key={quiz.id}
-							quiz={quiz}
-						/>
-					))}
+					{quiz.map(async (quiz) => {
+						const lastQuizPlay = await prisma.quizPlay.findFirst({
+							where: {
+								userId: user.id,
+								quizId: quiz.id,
+							},
+							orderBy: {
+								id: 'desc',
+							},
+							include: {
+								UserPlay: true,
+								_count: true,
+								quiz: { include: { _count: true } },
+							},
+						})
+						const isQuizSessionConcluded =
+							lastQuizPlay?._count.UserPlay === 0 ||
+							lastQuizPlay?._count.UserPlay === quiz._count.questions
+						console.log(
+							lastQuizPlay?.id,
+							lastQuizPlay?._count.UserPlay,
+							quiz._count.questions,
+						)
+						return (
+							<QuizCard
+								isQuizAlreadyPlayed={
+									!isQuizSessionConcluded && !!lastQuizPlay?.id
+								}
+								isFavorited={quiz.usersIds.includes(user.id)}
+								key={quiz.id}
+								quiz={quiz}
+							/>
+						)
+					})}
 				</section>
 				<PaginationServer
 					page={page}

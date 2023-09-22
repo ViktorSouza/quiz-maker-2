@@ -41,13 +41,20 @@ export default async function Quiz({
 		},
 		include: {
 			questions: { skip: page, take: 10 },
+			User: true,
 			_count: { select: { questions: true } },
 		},
 	})
 
-	const plays = await prisma.userPlay.count({
+	const publicPlays = await prisma.quizPlay.count({
 		where: {
-			quizId: searchParams.id,
+			quizId: params.id,
+		},
+	})
+	const plays = await prisma.quizPlay.count({
+		where: {
+			quizId: params.id,
+			userId: user?.id,
 		},
 	})
 
@@ -68,9 +75,26 @@ export default async function Quiz({
 				<BreadCrumbs breadCrumbs={breadCrumbs} />
 				<GoBack />
 			</div>
+			<div className='mb-5'>
+				<h1 className='text-2xl font-semibold'>{quiz.name}</h1>
+				<p className='dark:text-slate-400 text-slate-600'>{quiz.User?.name}</p>
+				<p>
+					{plays}{' '}
+					<span className='dark:text-slate-400 text-slate-600'>
+						Sessions played by you
+					</span>
+				</p>
+				<p>
+					{publicPlays}{' '}
+					<span className='dark:text-slate-400 text-slate-600'>
+						times played
+					</span>
+				</p>
+			</div>
 			<h1 className='text-2xl font-semibold col-span-6'>Questions</h1>
-			{plays} Plays
-			<div className='grid gap-2 grid-cols-4'>
+			<div
+				className='space-y-5
+			'>
 				{quiz.questions.length === 0
 					? 'No questions found'
 					: quiz.questions.map((question) => (

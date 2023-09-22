@@ -31,7 +31,10 @@ export async function PATCH(
 		where: { id: params.id, userId: user.id },
 		data: {
 			...body,
-			//TODO remove the favoriteQuiz relation if the user private the quiz
+			...(body.visibility === 'Private' && {
+				users: { set: [] },
+			}),
+			//TODO remove the favoriteQuiz relation if the user privates the quiz
 		},
 	})
 	return NextResponse.json({ quiz })
