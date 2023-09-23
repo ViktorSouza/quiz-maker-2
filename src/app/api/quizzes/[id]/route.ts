@@ -32,7 +32,19 @@ export async function PATCH(
 		data: {
 			...body,
 			...(body.visibility === 'Private' && {
-				users: { set: [] },
+				users: {
+					disconnect: (
+						await prisma.user.findMany({
+							where: {
+								favoriteQuizzes: {
+									some: {
+										id: params.id,
+									},
+								},
+							},
+						})
+					).map((user) => ({ id: user.id })),
+				},
 			}),
 			//TODO remove the favoriteQuiz relation if the user privates the quiz
 		},

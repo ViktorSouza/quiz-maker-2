@@ -73,7 +73,7 @@ export default async function Home({
 				</section>
 				<section className='col-span-6 my-5 grid grid-cols-6 gap-5'>
 					{quiz.map(async (quiz) => {
-						const lastQuizPlay = await prisma.quizPlay.findFirst({
+						const lastQuizPlayed = await prisma.quizPlay.findFirst({
 							where: {
 								userId: user.id,
 								quizId: quiz.id,
@@ -88,17 +88,12 @@ export default async function Home({
 							},
 						})
 						const isQuizSessionConcluded =
-							lastQuizPlay?._count.UserPlay === 0 ||
-							lastQuizPlay?._count.UserPlay === quiz._count.questions
-						console.log(
-							lastQuizPlay?.id,
-							lastQuizPlay?._count.UserPlay,
-							quiz._count.questions,
-						)
+							lastQuizPlayed?._count.UserPlay === 0 ||
+							lastQuizPlayed?._count.UserPlay === quiz._count.questions
 						return (
 							<QuizCard
 								isQuizAlreadyPlayed={
-									!isQuizSessionConcluded && !!lastQuizPlay?.id
+									!isQuizSessionConcluded && !!lastQuizPlayed?.id
 								}
 								isFavorited={quiz.usersIds.includes(user.id)}
 								key={quiz.id}
@@ -116,7 +111,7 @@ export default async function Home({
 				{activities && (
 					<>
 						<h1 className='text-2xl font-semibold'>Your activities</h1>
-						<ActivityChart activities={activities} />
+						<ActivityChart activities={activities} />{' '}
 					</>
 				)}
 			</section>

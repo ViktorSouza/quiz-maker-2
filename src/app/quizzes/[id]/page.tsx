@@ -77,24 +77,30 @@ export default async function Quiz({
 			</div>
 			<div className='mb-5'>
 				<h1 className='text-2xl font-semibold'>{quiz.name}</h1>
-				<p className='dark:text-slate-400 text-slate-600'>{quiz.User?.name}</p>
 				<p>
-					{plays}{' '}
-					<span className='dark:text-slate-400 text-slate-600'>
-						Sessions played by you
-					</span>
+					<span className='dark:text-slate-400 text-slate-600'>created by</span>{' '}
+					{quiz.User?.name}
 				</p>
-				<p>
-					{publicPlays}{' '}
-					<span className='dark:text-slate-400 text-slate-600'>
-						times played
-					</span>
-				</p>
+				<div className='flex gap-5'>
+					<p>
+						{plays}{' '}
+						<span className='dark:text-slate-400 text-slate-600'>
+							sessions played by you
+						</span>
+					</p>
+					<p>
+						{publicPlays}{' '}
+						<span className='dark:text-slate-400 text-slate-600'>
+							times played
+						</span>
+					</p>
+				</div>
 			</div>
 			<h1 className='text-2xl font-semibold col-span-6'>Questions</h1>
-			<div
+			{/* <div
 				className='space-y-5
-			'>
+			'> */}
+			<div className='grid grid-cols-2 gap-2'>
 				{quiz.questions.length === 0
 					? 'No questions found'
 					: quiz.questions.map((question) => (

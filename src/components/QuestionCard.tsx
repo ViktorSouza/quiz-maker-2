@@ -37,7 +37,7 @@ export function QuestionCard({ question }: { question: Question }) {
 		{ fallbackData: 0 },
 	)
 	return (
-		<div className='rounded-md flex flex-col  relative w-full'>
+		<div className='rounded-md flex flex-col  relative w-full bg-white p-5'>
 			<div className='right-3 absolute'></div>
 			<h1 className='text-2xl font-semibold text-blue-500'>
 				{question.question}

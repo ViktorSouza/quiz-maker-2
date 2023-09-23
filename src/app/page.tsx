@@ -20,7 +20,11 @@ export default async function PublicQuizzes({
 	const quizzes = await prisma.quiz.findMany({
 		where: {
 			visibility: 'Public',
-			name: { contains: searchParams.search },
+			OR: [
+				{ name: { contains: searchParams.search } },
+				{ description: { contains: searchParams.search } },
+				{ tags: { has: searchParams.search } },
+			],
 		},
 		include: {
 			_count: true,
