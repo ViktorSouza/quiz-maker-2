@@ -27,6 +27,7 @@ import { Question, Quiz } from '@prisma/client'
 import QuizEditorComponent from './QuizEditorComponent'
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
 import { useSession } from 'next-auth/react'
+import { toast } from 'react-hot-toast'
 type Inputs = {
 	options: string[]
 	correctOption: string
@@ -46,14 +47,17 @@ export default function QuestionEditorComponent({
 		handleSubmit,
 		control,
 		setValue,
+		reset,
 		watch,
 		formState: { errors },
 	} = useForm<Inputs>({
 		defaultValues: isEditing ? question : undefined,
 	})
+
 	if (errors) {
 		console.log(errors)
 	}
+
 	const quiz = useSWR<Quiz[]>(
 		'/quizzes',
 		(url: string) => api.get(url).then((res) => res.data.quizzes),
@@ -73,10 +77,12 @@ export default function QuestionEditorComponent({
 	const onSubmit: SubmitHandler<Inputs> = async (data) => {
 		if (isEditing && question?.id) {
 			await api.patch(`/questions/${question.id}`, data)
+			toast.success('Question edited with success')
 		} else {
 			await api.post('/questions', data)
+			toast.success('Question created with success')
 		}
-		control._reset()
+		reset(data)
 		route.refresh()
 	}
 
@@ -128,7 +134,7 @@ export default function QuestionEditorComponent({
 										variant='outline'
 										role='combobox'
 										className='w-[200px] justify-between'>
-										{quiz.data!.length
+										{quiz.data!.length !== 0
 											? quiz.data!.find((quiz) => quiz.id === watch('quizId'))
 													?.name
 											: 'Select quiz...'}

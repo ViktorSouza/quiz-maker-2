@@ -15,6 +15,7 @@ import { PlusCircle, Trash2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { toast } from 'react-hot-toast'
 
 type Form = Omit<Quiz, 'createdAt' | 'updatedAt'>
 
@@ -60,10 +61,13 @@ export default function QuizEditorComponent({
 			isEditing
 				? await api.patch(`quizzes/${quiz?.id}`, values)
 				: await api.post('quizzes', values)
+			if (isEditing) toast.success('Quiz edited with success')
+			else toast.success('Quiz created with success')
 
 			router.refresh()
 		})(event)
 	}
+
 	return (
 		<Dialog>
 			<DialogTrigger

@@ -7,7 +7,7 @@ export default function GoBack() {
 	const router = useRouter()
 	return (
 		<Button
-			variant='color'
+			variant='link'
 			onClick={router.back}>
 			<ArrowLeft size={16} /> Back
 		</Button>

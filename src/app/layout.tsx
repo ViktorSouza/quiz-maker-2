@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Providers from '../components/Providers'
 import MainHeader from '../components/MainHeader'
+import { Toaster } from 'react-hot-toast'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -25,6 +26,18 @@ export default function RootLayout({
 				className={`${inter.className} text-primary bg-slate-50 dark:bg-slate-950 `}>
 				<Providers>
 					<MainHeader />
+					<Toaster
+						position='top-center'
+						reverseOrder={false}
+						gutter={8}
+						containerClassName=''
+						containerStyle={{}}
+						toastOptions={{
+							// Define default options
+							className: 'bg-slate-100 dark:bg-slate-900 dark:text-slate-100',
+							duration: 2000,
+						}}
+					/>
 					<main className='p-5 mx-auto max-w-7xl'>{children}</main>
 				</Providers>
 			</body>

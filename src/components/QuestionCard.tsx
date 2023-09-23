@@ -31,15 +31,9 @@ import { useSession } from 'next-auth/react'
 
 export function QuestionCard({ question }: { question: Question }) {
 	const user = useSession()
-	const { data: quizAccuracy } = useSWR(
-		`questions/accuracy/${question.id}`,
-		(url: string) => api.get(url).then((res) => res.data.accuracy),
-		{ fallbackData: 0 },
-	)
 	return (
-		<div className='rounded-md flex flex-col  relative w-full bg-white p-5'>
-			<div className='right-3 absolute'></div>
-			<h1 className='text-2xl font-semibold text-blue-500'>
+		<div className='rounded-md flex flex-col  relative w-full bg-white dark:bg-slate-900 p-5'>
+			<h1 className='text-2xl font-semibold text-blue-500 dark:text-blue-400'>
 				{question.question}
 			</h1>
 			<p className='dark:text-slate-400 text-slate-600 mb-2'>
@@ -59,11 +53,11 @@ export function QuestionCard({ question }: { question: Question }) {
 						Show Wrong Answers
 					</PopoverTrigger>
 					<PopoverContent>
-						<ol className='flex gap-2 flex-wrap list-decimal list-inside'>
+						<ol className='list-decimal list-inside space-y-2'>
 							{question.options.map((option) => (
 								<li
 									key={option}
-									className='px-4 py-2'>
+									className=''>
 									{option}
 								</li>
 							))}

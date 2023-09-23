@@ -17,13 +17,14 @@ export default async function PublicQuizzes({
 }) {
 	const user = await getCurrentUser()
 	const page = Number(searchParams.page || '0') || 0
+	const search = searchParams.search ?? ''
 	const quizzes = await prisma.quiz.findMany({
 		where: {
 			visibility: 'Public',
 			OR: [
-				{ name: { contains: searchParams.search } },
-				{ description: { contains: searchParams.search } },
-				{ tags: { has: searchParams.search } },
+				{ name: { contains: search } },
+				{ description: { contains: search } },
+				{ tags: { has: search } },
 			],
 		},
 		include: {
@@ -58,7 +59,7 @@ export default async function PublicQuizzes({
 					return (
 						<PublicQuizCard
 							key={quiz.id}
-							isFavorite={quiz.users
+							isFavorited={quiz.users
 								.map((user) => user.id)
 								.includes(user?.id ?? '')}
 							quiz={quiz}

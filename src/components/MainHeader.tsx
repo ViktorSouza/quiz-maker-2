@@ -5,11 +5,12 @@ import { ToggleTheme } from './ToggleTheme'
 import { Grip, LogOut, User } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import SearchBar from './SearchBar'
+
 export default function MainHeader() {
 	const session = useSession()
 	return (
 		<header className='w-screen border-b mb-5'>
-			<div className='flex justify-between  p-5 w-full max-w-7xl mx-auto'>
+			<div className='flex justify-between items-center p-5 w-full max-w-7xl mx-auto'>
 				<Link href={'/'}>
 					<h1 className='font-semibold text-blue-500 dark:text-blue-400 text-lg'>
 						Quiz Maker 2.0

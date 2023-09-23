@@ -5,13 +5,13 @@ import { useForm } from 'react-hook-form'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { toast } from 'react-hot-toast'
 type UserForm = {
 	name: string
 }
 export default function Profile() {
-	const { data: user } = useSession({
+	const { data: user, update } = useSession({
 		required: true,
-		onUnauthenticated() {},
 	})
 
 	const {
@@ -33,7 +33,9 @@ export default function Profile() {
 				className='space-y-2'
 				onSubmit={handleSubmit(async (data) => {
 					await api.patch('/user', data)
+					update()
 					route.refresh()
+					toast('User updated🎉')
 				})}>
 				<div className='flex flex-col'>
 					<label

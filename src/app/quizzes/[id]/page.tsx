@@ -40,10 +40,16 @@ export default async function Quiz({
 			],
 		},
 		include: {
-			questions: { skip: page, take: 10 },
 			User: true,
 			_count: { select: { questions: true } },
 		},
+	})
+	const questions = await prisma.question.findMany({
+		where: {
+			quizId: quiz?.id,
+		},
+		skip: page,
+		take: 10,
 	})
 
 	const publicPlays = await prisma.quizPlay.count({
@@ -101,9 +107,9 @@ export default async function Quiz({
 				className='space-y-5
 			'> */}
 			<div className='grid grid-cols-2 gap-2'>
-				{quiz.questions.length === 0
+				{questions.length === 0
 					? 'No questions found'
-					: quiz.questions.map((question) => (
+					: questions.map((question) => (
 							<QuestionCard
 								key={question.id}
 								question={question}></QuestionCard>
