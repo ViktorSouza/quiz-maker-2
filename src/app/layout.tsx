@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 }
 
 import { cookies } from 'next/headers'
+import Script from 'next/script'
 export default function RootLayout({
 	children,
 }: {
@@ -22,6 +23,16 @@ export default function RootLayout({
 		<html
 			lang='en'
 			className={`${cookies().get('theme')?.value == 'dark' && 'dark'}`}>
+			<Script src='https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID' />
+			<Script id='google-analytics'>
+				{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+ 
+          gtag('config', 'G-60PLMXVTW3');
+        `}
+			</Script>
 			<body
 				className={`${inter.className} text-primary bg-slate-50 dark:bg-slate-950 `}>
 				<Providers>
