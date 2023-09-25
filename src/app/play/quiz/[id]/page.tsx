@@ -19,11 +19,17 @@ export default function Play({}) {
 	const { data, isLoading, error, mutate } = useSWR<{
 		question: Question
 		remaining: number
-	}>(`/play-quiz/${pathName.slice(11)}?page=${page}`, (url) => {
-		return api.get(url).then((res) => {
-			return res.data
-		})
-	})
+	}>(
+		`/play-quiz/${pathName.slice(11)}?page=${page}`,
+		(url) => {
+			return api.get(url).then((res) => {
+				return res.data
+			})
+		},
+		{
+			revalidateOnFocus: false,
+		},
+	)
 
 	const [selectedQuiz, setSelectedQuiz] = useState(0)
 	const [isAnswerCorrect, setIsAnswerCorrect] = useState<true | false | null>(
@@ -44,24 +50,27 @@ export default function Play({}) {
 
 	if (error) return 'Error :('
 	if (isLoading) return 'Loading...'
+	console.log(question, data?.remaining)
 	if (!question?.id || !data?.remaining)
 		return (
 			<div className='mx-auto w-96 bg-slate-100 dark:bg-slate-900 p-5'>
 				<h1 className='text-2xl font-medium mb-3'>No questions remaining</h1>
-				<Link
-					className='flex gap-3 items-center'
-					href={'/'}>
-					<ArrowLeft size={16} /> Back
-				</Link>
-				<Button
-					variant={'color'}
-					onClick={() => {
-						api.post(`/quizzes/${pathName.slice(11)}/session`).then(() => {
-							mutate()
-						})
-					}}>
-					New Round
-				</Button>
+				<div className='flex items-center gap-5'>
+					<Button
+						variant={'color'}
+						onClick={() => {
+							api.post(`/quizzes/${pathName.slice(11)}/session`).then(() => {
+								mutate()
+							})
+						}}>
+						New Session
+					</Button>
+					<Link
+						className='flex gap-3 items-center'
+						href={'/'}>
+						<ArrowLeft size={16} /> Back
+					</Link>
+				</div>
 			</div>
 		)
 
@@ -94,7 +103,7 @@ export default function Play({}) {
 								setIsAnswerCorrect(null)
 								setSelectedOption(option)
 							}}
-							className={`flex gap-3 w-full`}>
+							className={`flex gap-3 w-full items-center`}>
 							<div
 								className={cn(
 									`rounded-md p-5 flex justify-center items-center  h-5 w-5 bg-slate-200 dark:bg-slate-800`,

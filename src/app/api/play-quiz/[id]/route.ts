@@ -39,10 +39,27 @@ export async function POST(
 			id: 'desc',
 		},
 		include: {
-			UserPlay: true,
-			_count: true,
+			UserPlay: {
+				where: {
+					selectedOption: { equals: prisma.userPlay.fields.correctOption },
+				},
+			},
+			_count: {
+				select: {
+					UserPlay: {
+						where: {
+							correctOption: {
+								equals: prisma.userPlay.fields.selectedOption,
+							},
+						},
+					},
+				},
+			},
+			quiz: { include: { _count: true } },
 		},
 	})
+	console.log(quizPlay)
+	console.log(quizPlay?._count.UserPlay, question.Quiz?._count.questions)
 
 	if (
 		!quizPlay ||
@@ -54,8 +71,23 @@ export async function POST(
 				quizId: question.quizId,
 			},
 			include: {
-				UserPlay: true,
-				_count: true,
+				UserPlay: {
+					where: {
+						selectedOption: { equals: prisma.userPlay.fields.correctOption },
+					},
+				},
+				_count: {
+					select: {
+						UserPlay: {
+							where: {
+								selectedOption: {
+									equals: prisma.userPlay.fields.correctOption,
+								},
+							},
+						},
+					},
+				},
+				quiz: { include: { _count: true } },
 			},
 		})
 	}
@@ -108,26 +140,45 @@ export async function GET(
 			id: 'desc',
 		},
 		include: {
-			UserPlay: true,
-			_count: true,
+			UserPlay: {
+				where: {
+					correctOption: {
+						equals: prisma.userPlay.fields.selectedOption,
+					},
+				},
+			},
+			_count: {
+				select: {
+					UserPlay: {
+						where: {
+							correctOption: {
+								equals: prisma.userPlay.fields.selectedOption,
+							},
+						},
+					},
+				},
+			},
 			quiz: { include: { _count: true } },
 		},
 	})
 
-	console.log(user.id, params.id)
-	console.log(quizPlay?.id, params.id)
-
 	const findQuestionArgs: Prisma.QuestionFindFirstArgs = {
 		where: {
 			UserPlay: {
-				//I actually don't know how this is working, but I will not change anything😳
+				// I actually don't know how this is working, but I will not change anything😳
+
 				every: {
-					OR: [
-						{
-							quizPlayId: { not: quizPlay?.id },
-						},
-						{ userId: { not: user.id } }, // Exclude questions played by the user
-					],
+					NOT: {
+						OR: [
+							{
+								selectedOption: {
+									equals: prisma.userPlay.fields.correctOption,
+								}, //All options must be  incorrect
+								quizPlayId: quizPlay?.id, //The quiz must not be the current one
+								userId: user.id, //The user must not played the quiz in the current session nor selected the correct answer
+							},
+						],
+					},
 				},
 			},
 
@@ -164,5 +215,5 @@ export async function GET(
 		})
 	}
 
-	return NextResponse.json({ question, remaining })
+	return NextResponse.json({ question, remaining, quizPlay })
 }

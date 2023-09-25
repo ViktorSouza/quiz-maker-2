@@ -81,7 +81,7 @@ export default function QuizEditorComponent({
 			</DialogTrigger>
 			<DialogContent>
 				<div className='space-y-2'>
-					<h1>Quiz Editor</h1>
+					<h1 className='col-span-6 text-2xl font-semibold'>Quiz Editor</h1>
 					<form
 						onSubmit={onSubmit}
 						className='space-y-2'>
@@ -110,19 +110,28 @@ export default function QuizEditorComponent({
 								{...form.register('description')}
 								rows={10}></textarea>
 						</div>
-						<Select
-							onValueChange={(value: Visibility) =>
-								form.setValue('visibility', value)
-							}>
-							<SelectTrigger className='w-[180px] input'>
-								{' '}
-								<SelectValue placeholder='Visibility' />
-							</SelectTrigger>
-							<SelectContent ref={visibility}>
-								<SelectItem value='Private'>Private</SelectItem>
-								<SelectItem value='Public'>Public</SelectItem>
-							</SelectContent>
-						</Select>
+						<div>
+							<label
+								htmlFor='visibility'
+								className='text-sm font-medium'>
+								Visibility
+							</label>
+							<Select
+								onValueChange={(value: Visibility) =>
+									form.setValue('visibility', value)
+								}>
+								<SelectTrigger className='w-[180px] input'>
+									{' '}
+									<SelectValue
+										placeholder={form.watch('visibility') ?? 'Visibility'}
+									/>
+								</SelectTrigger>
+								<SelectContent ref={visibility}>
+									<SelectItem value='Private'>Private</SelectItem>
+									<SelectItem value='Public'>Public</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
 						<div className='space-y-2'>
 							<h1 className='font-medium'>Tags</h1>
 							{fieldsTag.map((option, index) => (
@@ -158,7 +167,8 @@ export default function QuizEditorComponent({
 						</button>
 						<Button
 							type='submit'
-							className='bg-blue-500'>
+							className='w-full'
+							variant={'color'}>
 							{isEditing ? 'Edit' : 'Create'} Quiz
 						</Button>
 					</form>

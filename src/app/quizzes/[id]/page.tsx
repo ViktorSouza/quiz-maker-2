@@ -44,6 +44,7 @@ export default async function Quiz({
 			_count: { select: { questions: true } },
 		},
 	})
+	if (!quiz) return notFound()
 	const questions = await prisma.question.findMany({
 		where: {
 			quizId: quiz?.id,
@@ -65,6 +66,30 @@ export default async function Quiz({
 	})
 
 	const totalPages = Math.floor((quiz?._count.questions ?? 0) / 10)
+	const lastQuizPlayed =
+		user?.id &&
+		(await prisma.quizPlay.findFirst({
+			where: {
+				userId: user.id,
+				quizId: quiz.id,
+			},
+			orderBy: {
+				id: 'desc',
+			},
+			include: {
+				UserPlay: { where: { userId: user?.id } },
+				_count: true,
+				quiz: { include: { _count: true } },
+			},
+		}))
+	const isQuizSessionConcluded =
+		lastQuizPlayed &&
+		(lastQuizPlayed?._count.UserPlay === 0 ||
+			lastQuizPlayed?._count.UserPlay === quiz._count.questions)
+
+	const isQuizAlreadyPlayed =
+		//Prevent Typescript error
+		!isQuizSessionConcluded && !!('id' in (lastQuizPlayed || {}))
 
 	if (!quiz) return notFound()
 	const breadCrumbs = [
@@ -102,11 +127,16 @@ export default async function Quiz({
 					</p>
 				</div>
 			</div>
-			<h1 className='text-2xl font-semibold col-span-6'>Questions</h1>
-			{/* <div
-				className='space-y-5
-			'> */}
-			<div className='grid grid-cols-2 gap-2'>
+			<div className='flex justify-between mb-5'>
+				<h1 className='text-2xl font-semibold col-span-6'>Questions</h1>
+
+				<Link
+					href={`/play/quiz/${quiz.id}`}
+					className='bg-blue-500 transition  hover:bg-blue-400 px-4 py-2 rounded-md text-slate-100 text-center'>
+					{isQuizAlreadyPlayed ? 'Continue' : 'Play'}
+				</Link>
+			</div>
+			<div className='grid grid-cols-2 gap-2 mb-5'>
 				{questions.length === 0
 					? 'No questions found'
 					: questions.map((question) => (

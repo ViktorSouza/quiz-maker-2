@@ -6,10 +6,10 @@ import { Bookmark, Lock } from 'lucide-react'
 export default function QuizCard({
 	quiz,
 	isQuizAlreadyPlayed,
-	isFavorited,
+	isFavorite,
 }: {
 	isQuizAlreadyPlayed: boolean
-	isFavorited: boolean
+	isFavorite: boolean
 	quiz: Quiz & {
 		_count: {
 			User: number
@@ -32,7 +32,7 @@ export default function QuizCard({
 							className='text-sm text-slate-500'
 						/>
 					)}
-					{isFavorited && (
+					{isFavorite && (
 						<Bookmark
 							className='text-yellow-500'
 							size={12}

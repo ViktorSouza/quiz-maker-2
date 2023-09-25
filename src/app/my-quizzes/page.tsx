@@ -95,7 +95,7 @@ export default async function Home({
 								isQuizAlreadyPlayed={
 									!isQuizSessionConcluded && !!lastQuizPlayed?.id
 								}
-								isFavorited={quiz.usersIds.includes(user.id)}
+								isFavorite={quiz.usersIds.includes(user.id)}
 								key={quiz.id}
 								quiz={quiz}
 							/>

@@ -16,34 +16,38 @@ export async function POST(
 			userId: user.id,
 			quizId,
 		},
+
 		include: {
-			_count: true,
-			quiz: {
-				include: {
-					_count: {
-						select: {
-							questions: true,
-							UserPlay: {
-								where: {
-									userId: user.id,
-									quizId,
-								},
+			_count: {
+				select: {
+					UserPlay: {
+						where: {
+							correctOption: {
+								equals: prisma.userPlay.fields.selectedOption,
 							},
 						},
 					},
 				},
 			},
+
+			quiz: {
+				include: {
+					_count: true,
+				},
+			},
+		},
+		orderBy: {
+			id: 'desc',
 		},
 	})
+	const isQuizCompleted =
+		quizPlay?.quiz?._count.questions === quizPlay?._count.UserPlay
 
-	if (!quizPlay)
-		return NextResponse.json(
-			{ message: 'You can not use this method without completing a quiz' },
-			{ status: 401 },
-		)
+	console.log(quizPlay?.quiz?._count.questions, quizPlay?._count.UserPlay)
 
-	//Detects if the User has completed the quiz
-	if (quizPlay.quiz?._count.questions === quizPlay._count.UserPlay)
+	console.assert(isQuizCompleted)
+
+	if (isQuizCompleted)
 		quizPlay = await prisma.quizPlay.create({
 			data: {
 				userId: user.id,
@@ -54,6 +58,13 @@ export async function POST(
 				quiz: { include: { _count: true } },
 			},
 		})
+	else
+		return NextResponse.json(
+			{ message: 'You can not use this method without completing a quiz' },
+			{ status: 401 },
+		)
+
+	//Detects if the User has completed the quiz
 	return NextResponse.json({
 		quizPlay,
 		bah: {
