@@ -10,11 +10,19 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Button } from '../../../../components/ui/button'
 
-export default function Play({}) {
+export default function Play() {
 	const pathName = usePathname()
 	const [selectedOption, setSelectedOption] = useState<string | null>(null)
 	const [page, setPage] = useState(0)
 	const router = useRouter()
+	const summary = useSWR<{
+		correctPlays: number
+		totalPlays: number
+	}>(`/quizzes/${pathName.slice(11)}/session/summary`, (url) => {
+		return api.get(url).then((res) => {
+			return res.data
+		})
+	})
 
 	const { data, isLoading, error, mutate } = useSWR<{
 		question: Question
@@ -50,11 +58,30 @@ export default function Play({}) {
 
 	if (error) return 'Error :('
 	if (isLoading) return 'Loading...'
-	console.log(question, data?.remaining)
 	if (!question?.id || !data?.remaining)
 		return (
-			<div className='mx-auto w-96 bg-slate-100 dark:bg-slate-900 p-5'>
-				<h1 className='text-2xl font-medium mb-3'>No questions remaining</h1>
+			<div className='mx-auto max-w-lg bg-slate-100 dark:bg-slate-900 p-5 rounded-md'>
+				<h1 className='text-2xl font-medium mb-3'>Congratulations🎉</h1>
+				<p className='dark:text-slate-400 text-slate-60 mb-5'>
+					You finished the quiz! Now, you can start a new one.
+				</p>
+				<div className='mb-5'>
+					<p>
+						Accuracy:{' '}
+						{((summary.data?.correctPlays ?? 0) /
+							(summary.data?.totalPlays ?? 0)) *
+							100}
+						%
+					</p>
+					<p>Correct answers: {summary.data?.correctPlays} times</p>
+					<p>
+						Wrong answers:{' '}
+						{(summary.data?.totalPlays ?? 0) -
+							(summary.data?.correctPlays ?? 0)}{' '}
+						times
+					</p>
+					<p>Total: {summary.data?.totalPlays}</p>
+				</div>
 				<div className='flex items-center gap-5'>
 					<Button
 						variant={'color'}
@@ -135,6 +162,7 @@ export default function Play({}) {
 						onClick={() => {
 							setSelectedOption(null)
 							setIsAnswerCorrect(null)
+							summary.mutate()
 							mutate()
 						}}>
 						Next Question
