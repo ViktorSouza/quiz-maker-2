@@ -53,9 +53,9 @@ export default async function Home({
 	)
 
 	return (
-		<div className='grid grid-cols-8 gap-3'>
+		<div className='md:grid grid-cols-8 gap-3'>
 			<h1 className='text-2xl font-semibold col-span-2'>Quizzes</h1>
-			<div className='flex items-stretch gap-3 col-span-6 justify-end'>
+			<div className='flex items-stretch gap-3 col-span-6 md:justify-end flex-wrap'>
 				<QuestionEditorComponent />
 				<QuizEditorComponent />
 				<Link
@@ -66,7 +66,7 @@ export default async function Home({
 			</div>
 
 			<section className='col-span-6'>
-				<section className='col-span-6 grid grid-cols-6 text-slate-500'>
+				<section className='col-span-6  grid-cols-6 text-slate-500  md:grid hidden'>
 					<span className='text-sm font-medium col-span-3 pl-4'>Quiz</span>
 					<span className='text-sm font-medium'>Questions</span>
 					<span className='text-sm font-medium'>Updated</span>
@@ -101,13 +101,15 @@ export default async function Home({
 							/>
 						)
 					})}
+					<div className='col-span-6'>
+						<PaginationServer
+							page={page}
+							totalPages={totalPages}
+						/>
+					</div>
 				</section>
-				<PaginationServer
-					page={page}
-					totalPages={totalPages}
-				/>
 			</section>
-			<section className='col-span-2 '>
+			<section className='col-span-2'>
 				{activities && (
 					<>
 						<h1 className='text-2xl font-semibold'>Your activities</h1>

@@ -39,12 +39,12 @@ export default async function PublicQuizzes({
 		((await prisma.quiz.count({ where: { visibility: 'Public' } })) ?? 0) / 10,
 	)
 	return (
-		<>
-			<div className='flex justify-between'>
+		<div>
+			<div className='flex justify-between flex-wrap'>
 				<h1 className='justify-self-start text-2xl font-semibold col-span-6'>
 					Public Quizzes
 				</h1>
-				<div className='flex items-stretch gap-3 col-span-6 justify-end'>
+				<div className='flex items-stretch gap-3 col-span-6 justify-between md:justify-end'>
 					<QuestionEditorComponent />
 					<QuizEditorComponent />
 					<Link
@@ -54,12 +54,12 @@ export default async function PublicQuizzes({
 					</Link>
 				</div>
 			</div>
-			<section className='col-span-6 my-5 grid grid-cols-2 gap-5'>
+			<section className='col-span-6 my-5 grid md:grid-cols-2 gap-5'>
 				{quizzes.map((quiz) => {
 					return (
 						<PublicQuizCard
 							key={quiz.id}
-							isFavorited={quiz.users
+							isFavorite={quiz.users
 								.map((user) => user.id)
 								.includes(user?.id ?? '')}
 							quiz={quiz}
@@ -71,6 +71,6 @@ export default async function PublicQuizzes({
 				page={page}
 				totalPages={totalPages}
 			/>
-		</>
+		</div>
 	)
 }

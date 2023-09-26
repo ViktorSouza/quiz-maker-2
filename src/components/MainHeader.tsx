@@ -10,9 +10,9 @@ export default function MainHeader() {
 	const session = useSession()
 	return (
 		<header className='w-screen border-b mb-5'>
-			<div className='flex justify-between items-center p-5 w-full max-w-7xl mx-auto'>
+			<div className='flex justify-between items-center p-5 w-full max-w-7xl mx-auto gap-5 flex-shrink'>
 				<Link href={'/'}>
-					<h1 className='font-semibold text-blue-500 dark:text-blue-400 text-lg'>
+					<h1 className='font-semibold text-blue-500 dark:text-blue-400 text-lg w-max'>
 						Quiz Maker 2.0
 					</h1>
 				</Link>
@@ -20,10 +20,10 @@ export default function MainHeader() {
 				<div className='flex gap-3'>
 					{session.data?.user ? (
 						<div className='flex gap-3 items-center'>
-							<h2>{session.data.user.name}</h2>
+							<h2 className='hidden md:block'>{session.data.user.name}</h2>
 							<Popover>
 								<PopoverTrigger>
-									<Grip size={20} />
+									<Grip size={24} />
 								</PopoverTrigger>
 								<PopoverContent className='flex flex-col justify-start gap-3 w-fit bg-slate-50 dark:bg-slate-900'>
 									<ul className='space-y-2'>

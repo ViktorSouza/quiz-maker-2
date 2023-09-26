@@ -88,8 +88,8 @@ export default async function Quiz({
 			lastQuizPlayed?._count.UserPlay === quiz._count.questions)
 
 	const isQuizAlreadyPlayed =
-		//Prevent Typescript error
-		!isQuizSessionConcluded && !!('id' in (lastQuizPlayed || {}))
+		//@ts-ignore
+		!isQuizSessionConcluded && !!lastQuizPlayed?.id
 
 	if (!quiz) return notFound()
 	const breadCrumbs = [
@@ -109,21 +109,18 @@ export default async function Quiz({
 			<div className='mb-5'>
 				<h1 className='text-2xl font-semibold'>{quiz.name}</h1>
 				<p>
-					<span className='dark:text-slate-400 text-slate-600'>created by</span>{' '}
+					<span className='dark:text-slate-400 text-slate-600'>Created by</span>{' '}
 					{quiz.User?.name}
 				</p>
-				<div className='flex gap-5'>
+				<div className='gap-5'>
 					<p>
 						{plays}{' '}
 						<span className='dark:text-slate-400 text-slate-600'>
 							sessions played by you
 						</span>
 					</p>
-					<p>
-						{publicPlays}{' '}
-						<span className='dark:text-slate-400 text-slate-600'>
-							times played
-						</span>
+					<p className='dark:text-slate-400 text-slate-400'>
+						Played <span className='text-primary'>{publicPlays}</span> times
 					</p>
 				</div>
 			</div>
@@ -136,7 +133,7 @@ export default async function Quiz({
 					{isQuizAlreadyPlayed ? 'Continue' : 'Play'}
 				</Link>
 			</div>
-			<div className='grid grid-cols-2 gap-2 mb-5'>
+			<div className='grid md:grid-cols-2 gap-2 mb-5'>
 				{questions.length === 0
 					? 'No questions found'
 					: questions.map((question) => (

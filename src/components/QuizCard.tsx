@@ -20,7 +20,7 @@ export default function QuizCard({
 	return (
 		<div
 			key={quiz.id}
-			className='bg-slate-100 dark:bg-slate-900 p-4 rounded-md grid gap-5 col-span-6 grid-cols-6 items-center'>
+			className='bg-slate-100 dark:bg-slate-900 p-4 rounded-md grid gap-5 col-span-6 grid-cols-4 md:grid-cols-6 items-center'>
 			<Link
 				href={`/quizzes/${quiz.id}`}
 				className='col-span-2'>
@@ -52,8 +52,8 @@ export default function QuizCard({
 				isEditing
 				quiz={quiz}
 			/>
-			<span>{quiz._count.questions}</span>
-			<span>
+			<span className='md:inline-block hidden'>{quiz._count.questions}</span>
+			<span className='md:inline-block hidden'>
 				{quiz.updatedAt.toLocaleDateString(undefined, {
 					day: '2-digit',
 					month: 'short',

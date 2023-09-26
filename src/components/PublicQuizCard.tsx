@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { toast } from 'react-hot-toast'
 export function PublicQuizCard({
 	quiz,
-	isFavorited,
+	isFavorite,
 }: {
 	quiz: Quiz & { User: { id: string; name: string } | null } & {
 		_count: {
@@ -18,13 +18,13 @@ export function PublicQuizCard({
 			UserPlay: number
 		}
 	}
-	isFavorited: boolean
+	isFavorite: boolean
 }) {
 	const router = useRouter()
 	return (
 		<div
 			key={quiz.id}
-			className='bg-white p-3 px-6 rounded-md flex flex-col justify-between dark:bg-slate-900'>
+			className='bg-white p-3 px-6 rounded-md flex flex-col justify-between dark:bg-slate-900 w-full'>
 			<div className='flex justify-between items-center w-full'>
 				<Link href={`/quizzes/${quiz.id}`}>
 					<h1 className='text-2xl font-semibold col-span-6 text-blue-500 dark:text-blue-400'>
@@ -36,15 +36,15 @@ export function PublicQuizCard({
 					className={cn(
 						'p-2 py-1 items-center bg-slate-200 dark:bg-slate-800 rounded-md flex gap-2',
 						{
-							'bg-yellow-300 dark:bg-yellow-500/50': isFavorited,
+							'bg-yellow-300 dark:bg-yellow-500/50': isFavorite,
 						},
 					)}
 					onClick={async () => {
-						isFavorited
+						isFavorite
 							? await api.delete(`user/favorites/${quiz.id}`)
 							: await api.post(`user/favorites/${quiz.id}`)
 						router.refresh()
-						isFavorited
+						isFavorite
 							? toast.success(`Unfavorited the quiz ${quiz.name}`)
 							: toast.success(`Favorited the quiz ${quiz.name}`)
 					}}>

@@ -34,7 +34,7 @@ export default function RootLayout({
         `}
 			</Script>
 			<body
-				className={`${inter.className} text-primary bg-slate-50 dark:bg-slate-950 `}>
+				className={`${inter.className} text-primary bg-slate-50 dark:bg-slate-950 w-screen`}>
 				<Providers>
 					<MainHeader />
 					<Toaster

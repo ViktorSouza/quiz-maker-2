@@ -12,16 +12,14 @@ export default function SearchBar() {
 		router.push(`?search=${throttledValue}`)
 	}, [throttledValue])
 	return (
-		<div className='bg-slate-200 dark:bg-slate-900 px-4 p-2 rounded-md flex gap-2 items-center'>
+		<div className='bg-slate-200 dark:bg-slate-900 px-4 p-2 rounded-md flex gap-2 items-center  w-auto'>
 			<input
 				type='text'
 				onChange={(e) => setValue(e.target.value)}
-				className='bg-transparent'
+				className='bg-transparent w-full'
 				placeholder='Search for a quiz'
 			/>
-			<Link href={{ search: 'bah=sim' }}>
-				<Search size={16} />
-			</Link>
+			<Search size={16} />
 		</div>
 	)
 }
