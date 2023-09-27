@@ -113,14 +113,10 @@ export default async function Quiz({
 					{quiz.User?.name}
 				</p>
 				<div className='gap-5'>
-					<p>
-						{plays}{' '}
-						<span className='dark:text-slate-400 text-slate-600'>
-							sessions played by you
-						</span>
-					</p>
 					<p className='dark:text-slate-400 text-slate-400'>
-						Played <span className='text-primary'>{publicPlays}</span> times
+						Played <span className='text-primary'>{publicPlays}</span> times (
+						{plays}{' '}
+						<span className='dark:text-slate-400 text-slate-600'>by you</span>)
 					</p>
 				</div>
 			</div>

@@ -68,17 +68,19 @@ export default function Play() {
 				<div className='mb-5'>
 					<p>
 						Accuracy:{' '}
-						{((summary.data?.correctPlays ?? 0) /
-							(summary.data?.totalPlays ?? 0)) *
-							100}
+						{(
+							((summary.data?.correctPlays ?? 0) /
+								(summary.data?.totalPlays ?? 0)) *
+							100
+						).toFixed(1)}
 						%
 					</p>
-					<p>Correct answers: {summary.data?.correctPlays} times</p>
+					<p>Correct answers: {summary.data?.correctPlays}</p>
 					<p>
 						Wrong answers:{' '}
 						{(summary.data?.totalPlays ?? 0) -
-							(summary.data?.correctPlays ?? 0)}{' '}
-						times
+							(summary.data?.correctPlays ?? 0)}
+						
 					</p>
 					<p>Total: {summary.data?.totalPlays}</p>
 				</div>

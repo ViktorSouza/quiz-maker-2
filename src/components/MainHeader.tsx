@@ -18,25 +18,32 @@ export default function MainHeader() {
 				</Link>
 				<SearchBar />
 				<div className='flex gap-3'>
-					{session.data?.user ? (
-						<div className='flex gap-3 items-center'>
+					<div className='flex gap-3 items-center'>
+						{session.data?.user ? (
 							<h2 className='hidden md:block'>{session.data.user.name}</h2>
-							<Popover>
-								<PopoverTrigger>
-									<Grip size={24} />
-								</PopoverTrigger>
-								<PopoverContent className='flex flex-col justify-start gap-3 w-fit bg-slate-50 dark:bg-slate-900'>
-									<ul className='space-y-2'>
+						) : (
+							<button onClick={() => signIn('google')}>Sign In</button>
+						)}
+
+						<Popover>
+							<PopoverTrigger>
+								<Grip size={24} />
+							</PopoverTrigger>
+							<PopoverContent className='flex flex-col justify-start gap-3 w-fit bg-slate-50 dark:bg-slate-900'>
+								<ul className='space-y-2'>
+									{session.data?.user && (
 										<li className='flex gap-2 items-center'>
 											<User size={16} />
 											<Link href={'/user/profile'}>Profile</Link>
 										</li>
-										<li>
-											<ToggleTheme text='Toggle Theme' />
-										</li>
-									</ul>
-									<hr />
-									<ul>
+									)}
+									<li>
+										<ToggleTheme text='Toggle Theme' />
+									</li>
+								</ul>
+								<hr />
+								<ul>
+									{session.data?.user && (
 										<li className='flex gap-2 items-center'>
 											<LogOut size={16} />
 											<button
@@ -45,13 +52,11 @@ export default function MainHeader() {
 												Sign out
 											</button>
 										</li>
-									</ul>
-								</PopoverContent>
-							</Popover>
-						</div>
-					) : (
-						<button onClick={() => signIn('google')}>Sign In</button>
-					)}
+									)}
+								</ul>
+							</PopoverContent>
+						</Popover>
+					</div>
 				</div>
 			</div>
 		</header>
