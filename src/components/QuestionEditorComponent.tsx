@@ -242,7 +242,7 @@ export default function QuestionEditorComponent({
 							Add Option
 						</button>
 					</div>
-					<button className='flex justify-center w-full gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground'>
+					<button className='flex justify-center w-full gap-2 px-4 py-2 rounded-md bg-blue-500 text-primary-foreground'>
 						{isEditing ? 'Edit Question' : 'Create Question'}
 					</button>
 					<button

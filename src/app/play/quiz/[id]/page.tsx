@@ -80,7 +80,6 @@ export default function Play() {
 						Wrong answers:{' '}
 						{(summary.data?.totalPlays ?? 0) -
 							(summary.data?.correctPlays ?? 0)}
-						
 					</p>
 					<p>Total: {summary.data?.totalPlays}</p>
 				</div>
@@ -123,7 +122,7 @@ export default function Play() {
 				{shuffledQuestion.map((option, index) => (
 					<li
 						className={`flex items-center space-x-2  ${
-							selectedOption === option && 'shadow-xl'
+							selectedOption === option && ''
 						} p-2 rounded-md items-center bg-white dark:bg-slate-900`}
 						key={crypto.randomUUID()}>
 						<button
@@ -154,9 +153,11 @@ export default function Play() {
 					</li>
 				))}
 			</ul>
-			{isAnswerCorrect !== null && (
-				<div>{isAnswerCorrect ? "You're correct!" : 'Wrong answer'}</div>
-			)}
+			<p className='my-5'>
+				{isAnswerCorrect !== null && (
+					<div>{isAnswerCorrect ? "You're correct!" : 'Wrong answer'}</div>
+				)}
+			</p>
 			<div className='flex gap-3 items-center'>
 				{isAnswerCorrect ? (
 					<Button
